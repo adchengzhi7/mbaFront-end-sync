@@ -13,13 +13,5 @@
   text-align: center;
   color: #2c3e50;
 }
-body { 
-			background-image: url("./assets/login-bg.jpg") ;
-			background-position: center center;
-			background-repeat:  no-repeat;
-			background-attachment: fixed;
-			background-size:  cover;
-			background-color: #999;
-  
-}
+
 </style>
