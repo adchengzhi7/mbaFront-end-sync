@@ -71,49 +71,21 @@ export default {
 };
 </script>
 <style scoped>
+@import "../assets/css/index.css";
 
-.btn-icon{
-  background-color: #ffffff;
-  height: 60px;
-  box-shadow: 0 5px 10px rgba(154, 160, 185, 0.05),
-    0 15px 40px rgba(166, 173, 201, 0.2);
-  border: 0;
-}
-.btn-icon i{
- color: #6c6c6c;
-}
+
 .p-50{
   padding: 35% 10%;
 }
-.btn-success{
-  background-color: #38b269;
-  border:0px;
-  box-shadow: 0px 8px 41px rgba(0, 159, 64, 0.25);
-  padding: 10px 60px;
-  border-radius: 15px;
-  font-weight: 700;
-}
-.title-green {
-  font-weight: 900;
-  color: #38b269;
-}
-.title-blue {
-  font-weight: 900;
-  color: #005ead;
-}
+
+
 
 .login-box {
   width: 40%;
   height: 100vh;
   background-color: rgba(255, 255, 255, 0.85);
 }
-.form-control {
-  background-color: #ffffff;
-  height: 60px;
-  box-shadow: 0 5px 10px rgba(154, 160, 185, 0.05),
-    0 15px 40px rgba(166, 173, 201, 0.2);
-  border: 0;
-}
+
 .home{
       overflow: hidden;
       background-image: url("../assets/login-bg.jpg") ;

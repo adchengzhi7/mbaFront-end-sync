@@ -4,17 +4,18 @@
        @mouseenter="sidebarIsExpand=true">
          <div class="m-top text-left h-100 ">
            <div class="section-height">
-
-           <div class="section" :key="item.id" v-for="item in section" :class="{'section-active':currentRouteName == item.router}" >
-             <span class="p-4">
-             <i :class="item.icon"></i>
-             </span>
-             <span v-show="sidebarIsExpand">{{item.title}}</span>
-           </div>
+            <router-link  :key="item.id" v-for="item in section"  :to="{name:item.router}" tag="div">
+              <div class="section" :class="{'section-active':currentRouteName == item.router}" >
+                <span class="p-4">
+                <i :class="item.icon"></i>
+                </span>
+                <span v-show="sidebarIsExpand">{{item.title}}</span>
+              </div>
+            </router-link>
            </div>
 
            <div class="logout">
-             <div class="dropdown-divider divider"></div>
+             <div class="dropdown-divider divider" :class="{'closebar-divider':!sidebarIsExpand}"></div>
              <div >
                <div class="section"  >
              <span class="p-4">
@@ -55,12 +56,15 @@
 .divider{
   margin: 0 25px;
 }
-.logout{
-    height: 15%;
-
+.closebar-divider{
+ width:25px;
+  margin: 0px 20px;
 }
-.section-height{
-  height: 80%;
+.logout{
+    position: fixed;
+    bottom: 10px;
+     width:250px;
+
 }
 .section{
   padding:15px 0;
@@ -68,28 +72,34 @@
   font-weight: 900;
 }
 .section:hover{
-    color: #38b269;
-    background-color: rgba(0,0,0,0.12);
+    background-color:var(--hoverBgColor)
 }
 .section-active{
-    color: #38b269;
+    color: var(--green);
 }
 .m-top{
   margin-top: 90px;
 }
-.bg-shadow {
-    box-shadow: 0 5px 10px rgba(154,160,185,0.05), 0 15px 40px rgba(166,173,201,0.2);
-}
+
 .closebar{
  width:65px;
   height: 100%;
   position: fixed;
+  top:0;
+  z-index: 999;
+  background-color: #ffffff;
+
 }
 .sidebar{
-  width:25%;
+  width:250px;
   height: 100%;
   position: fixed;
-  z-index: 2;
+  top:0;
+  z-index: 999;
+  background-color: #ffffff;
+}
+a:link{
+  text-decoration: none;
 }
 
 </style>

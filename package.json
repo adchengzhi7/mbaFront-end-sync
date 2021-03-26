@@ -9,15 +9,23 @@
   },
   "dependencies": {
     "argon-design-system-free": "^1.2.0",
+    "autoprefixer": "9",
     "bootstrap": "^4.6.0",
     "core-js": "^3.6.5",
     "jquery": "^3.6.0",
+    "node-sass": "^5.0.0",
     "popper.js": "^1.16.1",
+    "postcss": "7",
+    "sass-resources-loader": "^2.1.1",
+    "tailwindcss": "npm:@tailwindcss/postcss7-compat",
     "vue": "^3.0.0",
     "vue-avatar": "^2.3.3",
+    "vue-csv-import": "^4.0.1",
     "vue-router": "^4.0.3",
     "vue-sidebar-menu": "^4.7.4",
-    "vue-template-compiler": "^2.6.12"
+    "vue-sweetalert2": "^4.2.1",
+    "vue-template-compiler": "^2.6.12",
+    "vue2-dropzone": "^3.6.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",
