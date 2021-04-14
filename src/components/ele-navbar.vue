@@ -1,32 +1,40 @@
 <template >
-  <nav class="navbar fixed-top navbar-expand-lg navbar-light bg-light bg-shadow ">
+<nav class="navbar  fixed-top navbar-expand-lg navbar-light bg-light bg-shadow">
+  <div class="container-fluid">
     <a class="navbar-brand" href="#">
-      <img src="../assets/mba-logo.png" width="30" height="30" alt="">
-      <span class="theme">特色學習登錄</span>
+      <img class="img-fluid" src="../assets/mba-logo.png" width="30" height="30" alt="">
+      <span class="ms-2 me-2 theme">特色學習登錄</span>
     </a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav mr-auto"></ul>
-      <form class="form-inline my-2 my-lg-0">
-        <avatar :image="avatarImg" size="default" ></avatar>
-        <ul class="navbar-nav">
-          <li class="nav-item dropdown  ">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              李正治
+    <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
+     <ul class="navbar-nav me-auto mb-2 mb-lg-0 "></ul>
+     <div class="d-flex">
+       <avatar class="me-1 ms-1" :image="avatarImg" size="default" ></avatar>
+       <ul class="navbar-nav me-2">
+       <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarScrollingDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              {{user}}
             </a>
-            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-              <a class="dropdown-item" href="#">登出</a>
+            <div class="dropdown-menu dropdown-menu-start dropdown-menu-lg-end " aria-labelledby="navbarScrollingDropdown">
+              <a class="dropdown-item" href="#" @click.prevent="signOut">登出</a>
             </div>
           </li>
-        </ul>
-      </form>
+      
+      </ul>
+     </div>
+
     </div>
-  </nav>
+  </div>
+</nav>
+
+
 </template>
 <script>
 import avatar from "./ele-avatar"
+  import {mapGetters,mapActions} from 'vuex'
+
 export default {
   data() {
     return {
@@ -35,7 +43,42 @@ export default {
   },
   components:{
     avatar
-  }
+  },
+  methods: {
+    ...mapActions({
+      signOutAction:'auth/signOut',
+      checkTokenInvalid:'auth/checkTokenInvalid'
+    }),
+    signOut(){
+        this.signOutAction().then(() =>{
+          this.$router.replace({
+            name:"Home"
+          })
+        })
+    },
+    async checkIsLogin(){
+      let vm = this;
+      await vm.checkTokenInvalid().then( ()=>{
+        if(vm.isInvalidToken == true){
+          vm.signOutAction()
+        }
+
+      }
+      )
+
+
+    }
+  },
+  computed:{
+    ...mapGetters({
+      authenticated:'auth/authenticated',
+      user:'auth/user',
+      isInvalidToken:'auth/isInvalidToken'
+    })
+  },
+  mounted() {
+    this.checkIsLogin()
+  },
 }
 </script>
 <style scoped>

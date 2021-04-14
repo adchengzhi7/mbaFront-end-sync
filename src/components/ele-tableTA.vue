@@ -3,8 +3,8 @@
         <customTable>
             <template #caption>
                 <caption>
-                    <span>
-                        {{filterData.length}} of {{nameList.length }}
+                    <span v-if ="studentList">
+                        {{filterData.length}} of {{studentList.length }}
                     </span>
                     <span style="float:right">
 
@@ -17,26 +17,23 @@
                   <tr>
                     <th @click ="sortBy = 'id',isReverse = !isReverse"  scope="col">
                         <span :class="{'title-green':sortBy =='id'}">
-                            #
-                            <i v-if="sortBy =='id' && isReverse== false" class="fas fa-sort-down"></i>
-                            <i v-else-if="sortBy == 'id' && isReverse== true" class="fas fa-sort-up"></i>
-                            <i v-else class="fas fa-sort"></i>
+
                         </span>
 
                     </th>
                     <th  scope="col">姓名</th>
-                    <th @click ="sortBy = 'last',isReverse = !isReverse " scope="col">
-                        <span :class="{'title-green':sortBy =='last'}">
+                    <th @click ="sortBy = 'stuId',isReverse = !isReverse " scope="col">
+                        <span :class="{'title-green':sortBy =='stuId'}">
                             學號
-                            <i v-if="sortBy =='last' && isReverse== false" class="fas fa-sort-down"></i>
-                            <i v-else-if="sortBy == 'last' && isReverse== true" class="fas fa-sort-up"></i>
+                            <i v-if="sortBy =='stuId' && isReverse== false" class="fas fa-sort-down"></i>
+                            <i v-else-if="sortBy == 'stuId' && isReverse== true" class="fas fa-sort-up"></i>
                             <i v-else class="fas fa-sort"></i>
                         </span>
                     </th>
-                    <th @click ="sortBy = 'handle',isReverse = !isReverse, sortHandle= !sortHandle" scope="col">
-                        <span :class="{'title-green':sortBy =='handle'}">登記點數
-                        <i v-if="sortBy =='handle' && isReverse== false" class="fas fa-sort-down"></i>
-                        <i v-else-if="sortBy == 'handle' && isReverse== true" class="fas fa-sort-up"></i>
+                    <th @click ="sortBy = 'totalPoint',isReverse = !isReverse, sorttotalPoint= !sorttotalPoint" scope="col">
+                        <span :class="{'title-green':sortBy =='totalPoint'}">登記點數
+                        <i v-if="sortBy =='totalPoint' && isReverse== false" class="fas fa-sort-down"></i>
+                        <i v-else-if="sortBy == 'totalPoint' && isReverse== true" class="fas fa-sort-up"></i>
                         <i v-else class="fas fa-sort"></i>
                         </span> 
                         </th>
@@ -44,12 +41,12 @@
                 </tr>
             </template>
             <template #tbody>
-                <tr class="bg-shadow-hover rounded" :key="item.id" v-for="item in filterData">
-                    <th scope="row">{{item.id}}</th>
-                    <td   v-html="highlightMatches(item.first)"></td>
-                    <td  v-html="highlightMatches(item.last)"></td>
-                    <td  v-html="highlightMatches(item.handle)"></td>
-                    <td> <router-link :to="{name:'TaStudentPage'}">查看</router-link></td>
+                <tr class="bg-shadow-hover rounded" :key="'THT'+index" v-for="(item,index) in filterData">
+                    <th scope="row">{{}}</th>
+                    <td   v-html="highlightMatches(item.cName)"></td>
+                    <td  v-html="highlightMatches(item.stuId)"></td>
+                    <td  v-html="highlightMatches(item.totalPoint)"></td>
+                    <td> <router-link :to="{name:'TaStudentPage',query: { stuId: item.stuId }}">查看</router-link></td>
                 </tr>
             </template>
         </customTable>
@@ -58,20 +55,20 @@
 <script>
 import customTable from "./tmp-table"
 export default {
-    props:["filter"],
+    props:["filter","studentList"],
     components:{
         customTable
     },
     methods: {
         highlightMatches(text){
-      const matchExists = text.toLowerCase().includes(this.filter.toLowerCase());
+      const matchExists = text.toString().toLowerCase().includes(this.filter.toLowerCase());
       if (!matchExists) return text;
 
       const re = new RegExp(this.filter,'ig');
-      return text.replace(re,matchedText => `<strong class="text-success">${matchedText}</strong>`)
+      return text.toString().replace(re,matchedText => `<strong class="text-success">${matchedText}</strong>`)
     },
     nextPage:function() {
-      if((this.currentPage*this.pageSize) < this.nameList.length) this.currentPage++;
+      if((this.currentPage*this.pageSize) < this.studentList.length) this.currentPage++;
     },
     prevPage:function() {
       if(this.currentPage > 1) this.currentPage--;
@@ -80,85 +77,59 @@ export default {
     computed:{
         prevPageStatus(){
             let vm =this;
-            const totalPage =vm.nameList.length/vm.pageSize
-            return Math.ceil(totalPage)
+            if(vm.studentList){
+                const totalPage =vm.studentList.length/vm.pageSize
+                return Math.ceil(totalPage)
+            }
+            return 0
         },
         filterData(){
             let vm =this;
             const filterToLower = vm.filter.toString().toLowerCase();
-            const filterList=vm.nameList.filter(row => {
-                const first = row.first.toString().toLowerCase();
-                const last = row.last.toString().toLowerCase();
-                const handle = row.handle.toString().toLowerCase();
+            const studentList = vm.studentList;
+           
+            
+            if(studentList){
+                const arrayList =studentList.map((item)=>{
+                   return Object(item)
+                })
+                const filterList=arrayList.filter((row) => {
+                const cName = row.cName.toString().toLowerCase();
+                const stuId = row.stuId.toString().toLowerCase();
+                const totalPoint = row.totalPoint.toString().toLowerCase();
 
-                return last.includes(filterToLower) || first.includes(filterToLower) || handle.includes(filterToLower)
+                return stuId.includes(filterToLower) || cName.includes(filterToLower) 
+                || totalPoint.includes(filterToLower)
 
-            })
-            return filterList.sort(function(a, b) {
-                if (!vm.isReverse) {
-                return a[vm.sortBy] - b[vm.sortBy];
-                } else {
-                return b[vm.sortBy] - a[vm.sortBy];
-                }
-            }).filter((row, index) => {
-        let start = (this.currentPage-1)*this.pageSize;
-        let end = this.currentPage*this.pageSize;
-        if(index >= start && index < end) return true;
-      });
+                })
+                return filterList.sort(function(a, b) {
+                        if (!vm.isReverse) {
+                        return a[vm.sortBy] - b[vm.sortBy];
+                        } else {
+                        return b[vm.sortBy] - a[vm.sortBy];
+                        }
+                    })
+                .filter((row, index) => {
+                    let start = (this.currentPage-1)*this.pageSize;
+                    let end = this.currentPage*this.pageSize;
+                    if(index >= start && index < end) return true;
+            });
         }
+            return null
+            }
+
 
     },
     data() {
         return {
-            sortBy :'first',
+            sortBy :'cName',
             isReverse:'false',
             sortId:true,
-            sortLast:false,
-            sortHandle:false,
+            sortstuId:false,
+            sorttotalPoint:false,
             pageSize:10,
             currentPage:1,
-            nameList:[
-                {
-                    id:"1",
-                    first:"李政治",
-                    last:"10540592",
-                    handle:"5"
-                },
-                {
-                    id:"2",
-                    first:"黃昏後",
-                    last:"106301042",
-                    handle:"4"
-                },
-                {
-                    id:"3",
-                    first:"Aarry",
-                    last:"107932087",
-                    handle:"1"
-                },
-                {
-                    id:"4",
-                    first:"ok",
-                    last:"112932098",
-                    handle:"2"
-                },
-                {
-                    id:"5",
-                    first:"Aarry",
-                    last:"119932098",
-                    handle:"4"
-                },{
-                    id:"6",
-                    first:"Aarry",
-                    last:"119932098",
-                    handle:"4"
-                },{
-                    id:"7",
-                    first:"Aarry",
-                    last:"119932098",
-                    handle:"4"
-                }
-            ]
+           
         }
     },
     
@@ -167,6 +138,8 @@ export default {
 <style scoped>
 .table td, .table th {
     border-top: 0px !important;
+    border-bottom-width:0px !important;
+
 }
 .table {
     border-collapse: separate;

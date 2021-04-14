@@ -4,7 +4,7 @@
            
             <template #thead>
                   <tr>
-                    <th :key="th.key" v-for="th in thead" @click ="sortSelector(th.id,th.isSort)"  scope="col">
+                    <th class="" :key="th.key" v-for="th in thead" @click ="sortSelector(th.id,th.isSort)" :class="{'text-center':isDisplaySmall==true}"   scope="col">
                         <span :class="{'title-green':sortBy == th.id}">
                             {{th.title}}
                             <i v-if="sortBy == th.id && isReverse== false" class="fas fa-sort-down"></i>
@@ -19,39 +19,44 @@
                 </tr>
             </template>
             <template #tbody>
-                <tr class="bg-shadow-hover rounded " :key="item.id" v-for="item in filterData">
-                    <th scope="row" class="align-middle">{{item.id}}</th>
-                    <td class="align-middle">
-                        <div class="font-weight-bold"> {{item.section}}</div>
-                        <div class="text-muted">{{item.sectionTitle}}</div>
+                <tr class="bg-shadow-hover rounded " :key="index" v-for="(item,index) in filterData">
+                    <td class="align-middle ">
+                        <div class="ms-2 ms-md-0">
+                            <div class="font-weight-bold"> {{item.section}}</div>
+                            <div class="text-muted">
+                                <span>{{item.section_title}}</span>
+                                <span v-if ="item.englishCredit!= null" > -{{item.englishCredit}}分</span>
+                            </div>
+                        </div>
+
                     </td>
-                    <td class="align-middle">{{splitAndJoin(item.semester)}}</td>
-                    <td class="align-middle"  v-html="(item.point)"></td>
-                    <td class="align-middle">
+                    <td class="align-middle" :class="{'text-center':isDisplaySmall==true}" >{{splitAndJoin(item.semester)}}</td>
+                    <td class="align-middle" :class="{'text-center':isDisplaySmall==true}"  v-html="(item.point)"></td>
+                    <td class="align-middle" :class="{'text-center':isDisplaySmall==true}" >
                         <span v-if="item.status == 1">
-                            <button class="btn btn-outline-secondary font-weight-bold" > 待審核</button>
+                            <button class="font-weight-bold" :class="{'badge bg-success border-0':isDisplaySmall==true,'btn btn-outline-secondary ':isDisplaySmall==false}"> 待審核</button>
                         </span>
                         <span v-else>
-                            <button class="btn btn-outline-success font-weight-bold" > 已通過</button>
+                            <button class="font-weight-bold" :class="{'badge bg-success border-0':isDisplaySmall==true,'btn btn-outline-success':isDisplaySmall==false}" > 已通過</button>
                         </span>
                     </td>
                     <td class="align-middle ">
                         <span class="">
-                            <span v-if="item.status != 1 " class="btn">
-                                <i  class="fas fa-pen " :class="{'icon-clickable':item.status == 1 , 'icon-disable':item.status != 1}"></i>
+                            <span v-if="item.status != 1 " class="btn" :class="{'btn-sm':isDisplaySmall==true}"  >
+                                    <i  class="fas fa-pen " :class="{'icon-clickable':item.status == 1 , 'icon-disable':item.status != 1}"></i>
                             </span>
-                            <span v-else  class="btn btn-light" >
-                                <router-link  to="/"><i class="fas fa-pen " :class="{'icon-clickable':item.status == 1 , 'icon-disable':item.status != 1}"></i></router-link>
+                            <span v-else  class="btn btn-light"  @click="routerToWithParam(stuId,item.pointId)" :class="{'btn-sm':isDisplaySmall==true}" >
+                                <i class="fas fa-pen " :class="{'icon-clickable':item.status == 1 , 'icon-disable':item.status != 1}"></i>
                             </span>
                         </span>
-                        <span v-if="isTA">
-                            <span class="" >
-                                <button class="btn btn-light" :disabled="item.status != 1 " @click="showAlert()">
+                        <span >
+                            <span v-if="isTA" >
+                                <button class="btn btn-light" :disabled="item.status != 1 " @click="showAlert({pointId:item.pointId,status:item.status,stuId:stuId})" :class="{'btn-sm':isDisplaySmall==true}" >
                                 <i class="fas fa-check" :class="{'icon-success':item.status == 1 , 'icon-disable':item.status != 1}"></i>
                                 </button>
                             </span>
-                            <span class="" >
-                                <button class="btn btn-light"  @click="warningAlert()">
+                            <span v-if="(item.status == 1 && !isTA) || isTA" >
+                                <button class="btn btn-light"  @click="warningAlert({pointId:item.pointId,status:item.status,stuId:stuId})" :class="{'btn-sm':isDisplaySmall==true}"  >
                                     <i class="fas fa-times icon-danger" ></i>
                                 </button>
 
@@ -62,10 +67,10 @@
                     </td>
                 </tr>
                 <tr class="bg-shadow-hover rounded text-center pointer">
-                    <td v-if="!isTA" style=" padding: 0.6rem !important;" :colspan="thead.length+1" @click="routerTo('StudentReg')">
+                    <td v-if="!isTA" style=" padding: 0.6rem !important;" :colspan="thead.length+1" @click="routerTo('StudentReg',stuId)">
                          <router-link to="/"><i class="fas fa-plus"></i> 登錄點數</router-link>
                     </td>
-                    <td v-else style=" padding: 0.6rem !important;" :colspan="thead.length+1" @click="routerTo('TaReg')">
+                    <td v-else style=" padding: 0.6rem !important;" :colspan="thead.length+1" @click="routerTo('TaReg',stuId)">
                          <router-link to="/"><i class="fas fa-plus"></i> 登錄點數</router-link>
                     </td>
 
@@ -76,14 +81,26 @@
     </div>
 </template>
 <script>
-import customTable from "./tmp-table"
+import customTable from "./tmp-table";
+import { mapGetters,mapActions} from 'vuex'
+
 export default {
-    props:["isTA"],
+    props:["isTA","stuId"],
     components:{
         customTable
     },
+    mounted() {
+    },
     methods: {
-        async showAlert() {
+        ...mapActions({
+            regStudentIs:'regStudentIs',
+            approvePointId:'userPoint/approvePointId',
+            deletePointId:'userPoint/deletePointId',
+            getWidth:'getWidth'
+            
+        }),
+      
+      async showAlert(object) {
         let vm =this;
         
         await vm.$swal({
@@ -98,12 +115,16 @@ export default {
          })
          .then((result) => {
             if (result.isConfirmed) {
-                vm.successAlert("審核通過!")
+                vm.approvePointId(object).then(()=>{
+                    vm.successAlert("審核通過!")
+                }).catch((e)=>{
+                    console.log(e);
+                })
                 
             }
         })
       },
-      async warningAlert(){
+      async warningAlert(object){
           let vm = this;
           await vm.$swal({
             title: '<h2 class="font-weight-boldest m-0">您確定要刪除？</h2>',
@@ -116,8 +137,11 @@ export default {
             cancelButtonText: '取消',
          }) .then((result) => {
             if (result.isConfirmed) {
-                vm.successAlert("已刪除！")
-                
+                  vm.deletePointId(object).then(()=>{
+                    vm.successAlert("已刪除！!")
+                }).catch((e)=>{
+                    console.log(e);
+                })
             }
         })
       },
@@ -135,11 +159,24 @@ export default {
                 // })
 
       },
-        routerTo(path){
-            let vm = this;
-            vm.$router.push({name:path})
+      routerTo(path,id){
+          let vm = this;
+          vm.regStudentIs(id);
+          vm.$router.push({name:path})
         },
-        sortSelector(selected,isSort){
+        routerToWithParam(id,param){
+          let path = null;
+          let vm = this;
+          vm.regStudentIs(id);
+          if(!vm.isTA){
+              path="StudentRegFormEdit";
+              vm.$router.push({name:path,query: { pointsId:param }})
+          }else{
+              path="TaRegFormEdit";
+              vm.$router.push({name:path,query: { pointsId:param }})
+          }
+        },
+          sortSelector(selected,isSort){
             let vm = this;
             if(isSort){
                 vm.sortBy = selected;
@@ -149,19 +186,24 @@ export default {
             }
         },
         splitAndJoin(str){
-            const year = str.slice(0,3)
-            const smester = str.slice(3,4)
-           
-            return year + "/"+smester
-            
-
+            if(str != "00"){
+                const year = str.slice(0,3)
+                const smester = str.slice(3,4)
+                return year + "/"+smester
+            }
+            return "-"
          }
     },
     computed:{
+        ...mapGetters({
+        userPoints:'userPoint/userPoints',
+        windowWidth:'windowWidth'
+    }),
        
-        filterData(){
-            let vm =this;
-            return vm.nameList.sort(function(a, b) {
+    filterData(){
+        let vm =this;
+        if(vm.userPoints){
+            return vm.userPoints.sort(function(a, b) {
                 if (!vm.isReverse) {
                 return a[vm.sortBy] - b[vm.sortBy];
                 } else {
@@ -169,28 +211,37 @@ export default {
                 return b[vm.sortBy] - a[vm.sortBy];
                 }
             });
-            
-           
         }
+        return vm.nameList
+        
+    },
+    isDisplaySmall() {
+        let vm = this;
+        vm.getWidth();
+        if (vm.windowWidth > 768) {
+            return false;
+        } else {
+            return true;
+        }
+    }
 
     },
     data() {
         return {
             filter:"",
-            sortBy :'id',
+            sortBy :'semester',
             isReverse:false,
+            isDisplaySm:false,
             thead:
                 [
-                {key:'th01',id:"id",title:"#",isSort:true},
                 {key:'th02',id:"section",title:"項目",isSort:false},
                 {key:'th03',id:"semester",title:"學期",isSort:true},
                 {key:'th04',id:"point",title:"點數",isSort:true},
                 {key:'th05',id:"status",title:"狀態",isSort:true},
                 ],
+                
             nameList:[
-                {id:"1",section:"國際交換或雙聯學位",sectionTitle:"SKEMA Business School",semester:"1091",point:"1",status:"1"},
-                {id:"2",section:"國際交換或雙聯學位",sectionTitle:"SKEMA Business School",semester:"1082",point:"3",status:"2"},
-                {id:"3",section:"英語檢定",sectionTitle:"TOEFL PBT",semester:"1081",point:"0",status:"2"},
+                {id:"1",section:"",section_title:"",semester:"",point:"",status:""},
             ]
         }
     },
@@ -198,19 +249,24 @@ export default {
 }
 </script>
 <style scoped>
+
 .table td, .table th {
     border-top: 0px !important;
-    padding:  0rem  1.75rem !important;
+    border-bottom-width:0px !important;
+    padding: 0rem 0.15rem !important;
+    font-size: 12px !important;
+
 
 }
 
 .table tbody td, .table tbody th {
-    padding: 1.75rem !important;
+    padding: 0.35rem 0.15rem !important;
 }
 
 .table {
     border-collapse: separate;
     border-spacing: 0px 0.5rem;
+
 }
 .table thead th {
     border-bottom: 0px;
@@ -230,6 +286,64 @@ a{
     font-weight:900;
 }
 
+/* Small devices (landscape phones, 576px and up) */
+@media (min-width: 576px) {
+    .table td, .table th {
+        padding: 0rem 0.15rem !important;
+        font-size: 12px !important;
+    }
+    .table tbody td, .table tbody th {
+        padding: 0.35rem 0.15rem !important;
+    }
+    .table {
+        font-size: 12px !important;
+    }
+    
+ }
+
+/* Medium devices (tablets, 768px and up) */
+@media (min-width: 768px) { 
+    .table td, .table th {
+        padding:  0rem  1.75rem !important;
+        font-size: 16px !important;
+    }
+     .table tbody td, .table tbody th {
+        padding: 1.75rem !important;
+    }
+    .table {
+        font-size: 16px;
+    }
+}
+ 
+/* Large devices (desktops, 992px and up) */
+@media (min-width: 992px) {
+     .table td, .table th {
+        padding:  0rem  1.75rem !important;
+        font-size: 16px !important;
+    }
+    .table tbody td, .table tbody th {
+        padding: 1.75rem !important;
+    }
+    .table {
+        font-size: 16px;
+    }
+ }
+
+/* X-Large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) {
+      .table td, .table th {
+        padding:  0rem  1.75rem !important;
+        font-size: 16px !important;
+
+    }
+     .table tbody td, .table tbody th {
+        padding: 1.75rem !important;
+    }
+    .table {
+        font-size: 16px;
+    }
+
+}
 
 
 </style>

@@ -28,20 +28,7 @@ export default {
 data() {
     return {
       isTA:true,
-      userData:{
-        name:"李正治",
-        stuId:"105306030",
-        points:[
-          {
-            type:"",
-            point:"1"
-          },{
-            type:"",
-            point:"1"
-          },
-        ]
-      },
-     
+      selectedUser:'105306030',
       section:[{
         id:"S01",
         title:"學分查詢",

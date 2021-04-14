@@ -1,6 +1,6 @@
 <template>
     <div>
-        <table class="table">
+        <table class="table table-responsive">
             <slot name="caption"></slot>
             <thead>
                 <slot name="thead"></slot>
@@ -22,6 +22,8 @@ tbody{
 }
 .table td, .table th {
     border-top: 0px !important;
+    border-bottom-width:0px !important;
+
 }
 .table {
     border-collapse: separate;

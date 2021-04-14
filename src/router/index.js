@@ -7,26 +7,42 @@ import TaReview from '../views/Ta-Review.vue'
 import TaReg from '../views/Ta-Reg.vue'
 import TaStudentPage from '../views/Ta-StudentPage.vue'
 import TaRegForm from '../views/Ta-Reg-Form.vue'
+import TaRegFormEdit from '../views/Ta-Reg-EditForm.vue'
 import readCsv from '../views/Ta-ImportUser.vue'
 import StudentReg from '../views/Student-Reg.vue'
 import StudentRegForm from '../views/Student-Reg-Form.vue'
+import StudentRegFormEdit from '../views/Student-Reg-EditForm.vue'
 import StudentDash from '../views/Student-Dash.vue'
+import store from '@/store'
 
 const routes = [
   {
     path: '/',
     name: 'Home',
-    component: Home
+    component: Home,
+    beforeEnter: (to, from, next) => {
+      if(store.getters['auth/authenticated'].token){
+        if(store.getters['auth/authenticated'].userType == 0){return next({name:'Student'})}
+        if(store.getters['auth/authenticated'].userType == 1){return next({name:'TaDash'})}
+        return next()
+      }else{
+        return next()
+      }
+    },
   },
   {
     path: "/ta",
     name: 'Ta',
     redirect:"/ta/dash",
     component:Ta,
+    meta:{
+      needLogin:true,
+      adminAccess:true
+    },   
     children:[{
       path: "dash",
       name: 'TaDash',
-      component:TaDash
+      component:TaDash,
     },
     {
       path: "review",
@@ -49,6 +65,11 @@ const routes = [
       component:TaRegForm
     },
     {
+      path:"registerFormEdit",
+      name:"TaRegFormEdit",
+      component:TaRegFormEdit
+    },
+    {
       path:"readCsv",
       name:"readCsv",
       component:readCsv
@@ -62,6 +83,9 @@ const routes = [
     name: 'Student',
     redirect:"/student/dash",
     component:Student,
+    meta:{
+      needLogin:true,
+    },    
     children:[{
       path: "dash",
       name: 'StudentDash',
@@ -73,6 +97,11 @@ const routes = [
       component:StudentReg,
     },
     {
+      path:"registerFormEdit",
+      name:"StudentRegFormEdit",
+      component:StudentRegFormEdit
+    },
+    {
       path:"registerForm",
       name:"StudentRegForm",
       component:StudentRegForm
@@ -81,10 +110,28 @@ const routes = [
   },
   
 ]
-
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
 })
+
+router.beforeEach(function(to, from, next) {
+  if (to.meta.needLogin === true) {
+    if(!store.getters['auth/authenticated'].token){
+      return next({
+        name:'Home'
+      })
+    }
+  }
+  if(to.meta.adminAccess === true){
+    if(store.getters['auth/authenticated'].userType != 1){return next({name:'Home'})}
+    
+  }
+
+
+  next();
+});
+
+
 
 export default router

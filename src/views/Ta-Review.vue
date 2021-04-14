@@ -1,21 +1,21 @@
 
 <template>
   <div > 
-     <div class="partTop mt-5">
-       <div class="row mb-3">
-         <div class="col"></div>
-         <div class="col-9">
+     <div class="partTop mt-0 mt-md-5">
+       <div class="row m-0 mb-3">
+         <div class="col d-none d-sm-block d-xl-block"></div>
+         <div class="col-12 col-xl-9 col-md-9  col-sm-10 col-xs-12 ">
             <input class="form-control" v-model="filter" placeholder="輸入查詢的姓名、學號" type="text"  >
          </div>
-         <div class="col"></div>
+         <div class="col d-none d-sm-block d-xl-block"></div>
        </div>
-       <div class="row ">
-         <div class="col"></div>
-         <div class="col-9">
-            <tables :filter= "filter"></tables>
+       <div class="row m-0 ">
+         <div class="col d-none d-sm-block d-xl-block"></div>
+         <div class="col-12 col-xl-9 col-md-9  col-sm-10 col-xs-12 ">
+            <tables class="overflow-auto" :filter= "filter"></tables>
          </div>
         
-         <div class="col"></div>
+         <div class="col d-none d-sm-block d-xl-block"></div>
        </div>
      </div>
   </div>

@@ -1,39 +1,77 @@
 <template>
   <div > 
-     <student-page :isTA="isTA" :userData="userData"></student-page>
+     <student-page :key="ConfirmGetUserId" :isTA="isTA" :userData="userData" :userPoints="userPoints" ></student-page>
+  
   </div>
 </template>
 
 <script>
 import studentPage from "../components/tmp-studentPage"
-export default {
+import {mapActions, mapGetters} from 'vuex'
 
+export default {
+  
+  
+computed:{
+    ...mapGetters({
+      userId:'auth/userId',
+      user:'auth/user',
+      userPoints:'userPoint/userPoints'
+
+      
+    }),
+     isTA(){
+       if(this.$store.state.auth.userType == 0){
+          return false
+        } else {
+          return true
+        }
+       
+     },
+     ConfirmGetUserId(){
+      if(this.$store.state.auth.userId){
+          this.regStudentIs(this.$store.state.auth.userId)
+           return this.getPointsData(this.$store.state.auth.userId)
+
+          }
+          return null
+     }
+  },
   components:{
     studentPage,
   },
-  
   methods: {
-    
+    ...mapActions({
+       getUserPoint:'userPoint/getUserPoint',
+        regStudentIs:'regStudentIs',
+      signOutAction:'auth/signOut'
+
+    }),
+    getPointsData(id){
+       let vm = this;
+         vm.points = this.getUserPoint(id)
+         .catch(function(e){
+           vm.signOutAction().then(() =>{
+             vm.$router.replace({
+               name:"Home"
+          })
+          })
+          console.log(e);
+          })
+         
+    }
+  },
+   mounted() {
+     
+     
+     
   },
 data() {
     return {
-      isTA:false,
       userData:{
-        name:"李正治",
-        stuId:"105306030",
-        points:[
-          {
-            type:"",
-            point:"1"
-          },{
-            type:"",
-            point:"1"
-          },
-        ]
+        name:this.$store.state.auth.user,
+        stuId:this.$store.state.auth.userId,
       },
-      
-   
-      
     }
   },
 

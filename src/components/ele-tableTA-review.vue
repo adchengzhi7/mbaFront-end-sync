@@ -3,8 +3,8 @@
         <customTable>
             <template #caption>
                 <caption>
-                    <span>
-                        {{filterData.length}} of {{nameList.length }}
+                    <span v-if="unreviewPoints">
+                        {{filterData.length}} of {{unreviewPoints.length }}
                     </span>
                 </caption>
             </template>
@@ -29,30 +29,46 @@
                     <td class="align-middle" v-html="highlightMatches(item.stuId)"></td>
                     <td >
                         <div class="font-weight-bold" v-html="highlightMatches(item.section)"></div>
-                        <div class="small text-muted" v-html="highlightMatches(item.sectionTitle)"></div>
+                        <div class="d-flex">
+
+                            <div class="small text-muted" v-html="highlightMatches(item.sectionTitle)"></div>
+                            <div class="small text-muted"  v-if ="item.englishCredit!= null" > -{{item.englishCredit}}分</div>
+                        </div>
                     </td>
                     <td class="align-middle" v-html="highlightMatches(splitAndJoin(item.semester))"></td>
                     <td class="align-middle small text-muted"> {{dateShow(item.date)}}</td>
-                    <td class="align-middle"> <router-link :to="{name:'TaStudentPage'}">查看</router-link></td>
+                    <td  class="align-middle"> <router-link :to="{name:'TaStudentPage',query: { stuId: item.stuId }}">查看</router-link></td>
+
                 </tr>
-                <tr  v-if="nameList.length > pageSize" >
-                    <td :colspan="thead.length+2" class="bg-shadow-hover pointer text-center" @click.prevent="loadMore">
-                        <a class="btn" @click.prevent="loadMore">查看更多</a>
-                    </td>
-                </tr>
+                <template v-if="unreviewPoints">
+                    <tr  v-if="unreviewPoints.length > pageSize" >
+                        <td :colspan="thead.length+2" class="bg-shadow-hover pointer text-center" @click.prevent="loadMore">
+                            <a class="btn" @click.prevent="loadMore">查看更多</a>
+                        </td>
+                    </tr>
+
+                </template>
             </template>
         </customTable>
         
     </div>
 </template>
 <script>
-import customTable from "./tmp-table"
+import customTable from "./tmp-table";
+import {mapGetters ,mapActions} from "vuex";
+
 export default {
     props:["filter"],
     components:{
         customTable
     },
+    mounted() {
+        this.getUnreviewPoint()
+    },
     methods: {
+        ...mapActions({
+            getUnreviewPoint:'userPoint/getUnreviewPoint'
+        }),
         sortSelector(selected,isSort){
             let vm = this;
                 if(isSort){
@@ -63,11 +79,11 @@ export default {
                 }
         },
         highlightMatches(text){
-            const matchExists = text.toLowerCase().includes(this.filter.toLowerCase());
+            const matchExists = text.toString().toLowerCase().includes(this.filter.toLowerCase());
             if (!matchExists) return text;
 
             const re = new RegExp(this.filter,'ig');
-            return text.replace(re,matchedText => `<strong class="text-success">${matchedText}</strong>`)
+            return text.toString().replace(re,matchedText => `<strong class="text-success">${matchedText}</strong>`)
         },
         loadMore:function() {
             // if((this.currentPage*this.pageSize) < this.nameList.length) this.currentPage++;
@@ -75,13 +91,16 @@ export default {
         },
     
         splitAndJoin(str){
-            const year = str.slice(0,3)
-            const smester = str.slice(3,4)
-            return year + "/"+smester
+           if(str != "00"){
+                const year = str.slice(0,3)
+                const smester = str.slice(3,4)
+                return year + "/"+smester
+            }
+            return "-"
          },
          dateShow(date){
-             const gotDate = new Date(date);
-             const today  = new Date();
+             let gotDate =new Date(date);
+             let today = new Date()
              const diffTimeStamp = today.getTime()- gotDate.getTime()
              const diffMin = Math.floor(diffTimeStamp / (1000*60)) ;
              const diffTime = Math.floor(diffTimeStamp / (1000*3600)) ;
@@ -94,15 +113,28 @@ export default {
          }
     },
     computed:{
+        ...mapGetters({
+            unreviewPoints:'userPoint/unreviewPoints'
+        }),
         prevPageStatus(){
             let vm =this;
-            const totalPage =vm.nameList.length/vm.pageSize
-            return Math.ceil(totalPage)
+            if(vm.unreviewPoints){
+                const totalPage =vm.unreviewPoints.length/vm.pageSize
+                return Math.ceil(totalPage)
+            }
+            return 0
+            
         },
         filterData(){
             let vm =this;
             const filterToLower = vm.filter.toString().toLowerCase();
-            const filterList=vm.nameList.filter(row => {
+            const unreviewPoints = vm.unreviewPoints;
+            
+            if(unreviewPoints){
+            const arrayList =unreviewPoints.map((item)=>{
+                return Object(item)
+            })
+            const filterList=arrayList.filter(row => {
             const name = row.name.toString().toLowerCase();
             const stuId = row.stuId.toString().toLowerCase();
             const section = row.section.toString().toLowerCase();
@@ -122,12 +154,14 @@ export default {
                 let end = this.currentPage*this.pageSize;
                 if(index >= start && index < end) return true;
                 });
-        }
+            }
+            return null
+         }   
 
     },
     data() {
         return {
-            sortBy :'id',
+            sortBy :'semester',
             isReverse:'false',
             pageSize:10,
             currentPage:1,
@@ -157,6 +191,8 @@ export default {
 <style scoped>
 .table td, .table th {
     border-top: 0px !important;
+    border-bottom-width:0px !important;
+    
 }
 .table {
     border-collapse: separate;

@@ -1,31 +1,31 @@
 
 <template>
   <div > 
-     <div class="partTop mt-5">
-       <div class="row mb-3">
-         <div class="col"></div>
-         <div class="col-6">
+     <div class="partTop mt-0 mt-md-5">
+       <div class="row m-0 mb-3">
+         <div class="col d-none d-sm-block d-xl-block"></div>
+         <div class="col-12 col-md-6">
             <input class="form-control" v-model="filter" placeholder="輸入查詢的姓名、學號" type="text"  >
 
          </div>
-         <div class="col-4"></div>
-         <div class="col"></div>
+         <div class="col-4 d-none d-sm-block d-xl-block "></div>
+         <div class="col d-none d-sm-block d-xl-block"></div>
        </div>
-       <div class="row ">
-         <div class="col"></div>
-         <div class="col-6">
-            <tables :filter= "filter"></tables>
+       <div class="row m-0 ">
+         <div class="col d-none d-sm-block d-xl-block"></div>
+         <div class="col-12 col-md-6">
+            <tables :filter= "filter" :studentList="studentList"></tables>
          </div>
-         <div class="col-4">
+         <div class="col-12 col-md-4 ">
            <div class="d-flex flex-wrap">
              <h5 class="font-weight-bold">待審核清單</h5>
-             <div >
-              <span class="danger float-left badge badge-pill badge-danger ">{{unReviewList.length}}</span>
+             <div v-if="unreviewPoints" >
+              <span class="danger float-left badge badge-pill badge-danger ">{{unreviewPoints.length}}</span>
 
               </div>
             </div>
            <div>
-             <div :key="item.id" v-for="item in unReviewListLimited" class="bg-shadow-hover review-box  pointer" @click="routerTo('TaStudentPage')">
+             <div :key="item.id" v-for="item in unReviewListLimited" class="bg-shadow-hover review-box  pointer" @click="routerTo('TaStudentPage',item.stuId)">
                <div class="d-flex flex-wrap">
                  <div class="col-1  ">
                   <div class="circle small p-1"></div>
@@ -33,17 +33,17 @@
                  <div class="col pl-0 d-flex flex-wrap">
                    <div>
                       <div class="h5 d-flex flex-wrap m-0">
-                      <div class="font-weight-bold ">{{item.user.name}}</div>
-                      <div class="text-muted ">  {{  item.user.stuId}}</div>
+                      <div class="font-weight-bold ">{{item.name}}</div>
+                      <div class="text-muted ">  {{  item.stuId}}</div>
                     </div>
-                    <p class='text-muted m-0'>{{item.type}}</p>
+                    <p class='text-muted m-0'>{{item.section}}</p>
                     <div>
                       <small class="text-muted">
                     {{  dateShow(item.date)}}
                       </small>
                     </div>
                    </div>
-                   <div class="ml-auto align-self-center">
+                   <div class="ms-auto align-self-center">
                       <button class="btn btn-outline-secondary font-weight-bold">待審核</button>
                    </div>
                     
@@ -59,7 +59,7 @@
              </div>
            </div>
          </div>
-         <div class="col"></div>
+         <div class="col d-none d-sm-block d-xl-block"></div>
        </div>
      </div>
   </div>
@@ -67,6 +67,7 @@
 
 <script>
 import tables from "../components/ele-tableTA"
+import {mapGetters,mapActions} from "vuex"
 
 export default {
 
@@ -75,24 +76,43 @@ export default {
   },
 
   computed:{
+    ...mapGetters({
+      studentList:'student/studentList',
+      authenticated:'auth/authenticated',
+      unreviewPoints:'userPoint/unreviewPoints'
+    }),
     unReviewListLimited(){
       let vm = this;
+      const unreviewPoints = vm.unreviewPoints;
+      if(unreviewPoints){
+        const arrayList =unreviewPoints.map((item)=>{
+              return Object(item)
+          })
+        return arrayList.filter((row, index) => {
+          let start = (vm.currentPage-1)*vm.pageSize;
+          let end = vm.currentPage*vm.pageSize;
+        if(index >= start && index < end) return true;
+      })
+      }return []
 
-      return vm.unReviewList.filter((row, index) => {
-        let start = (vm.currentPage-1)*vm.pageSize;
-        let end = vm.currentPage*vm.pageSize;
-      if(index >= start && index < end) return true;
-    })
     }
   },
   methods: {
-     routerTo(path){
+    
+    ...mapActions({
+      getStudentList:'student/getStudentList',
+      getUnreviewPoint:'userPoint/getUnreviewPoint'
+
+    }),
+    
+     routerTo(path,stuId){
             let vm = this;
-            vm.$router.push({name:path})
+            vm.$router.push({ name: path, query: {stuId:stuId } })
+
         },
      dateShow(date){
-             const gotDate = new Date(date);
-             const today  = new Date();
+             let gotDate =new Date(date);
+             let today = new Date()
              const diffTimeStamp = today.getTime()- gotDate.getTime()
              const diffMin = Math.floor(diffTimeStamp / (1000*60)) ;
              const diffTime = Math.floor(diffTimeStamp / (1000*3600)) ;
@@ -108,20 +128,7 @@ data() {
     return {
       filter:"",
       currentPage:1,
-      pageSize:10,
-      userData:{
-        name:"李正治",
-        stuId:"105306030",
-        points:[
-          {
-            type:"",
-            point:"1"
-          },{
-            type:"",
-            point:"1"
-          },
-        ]
-      },
+      pageSize:5,
       unReviewList:[{
         id:"UR0",
         user:{
@@ -136,7 +143,7 @@ data() {
         id:"UR1",
         user:{
            name:"李正治",
-          stuId:"105306030",
+          stuId:"105306032",
         },
         type:"國際交換或雙聯學位",
         date:"2021-02-22  22:30:00"
@@ -146,6 +153,10 @@ data() {
       avatarImg:"http://placehold.it/64x64",
       
     }
+  },
+  mounted() {
+    this.getStudentList()
+    this.getUnreviewPoint()
   },
 
 }
@@ -180,6 +191,9 @@ data() {
 	height: 5px;
 
 }
-
+a{
+    color:var(--green);
+    font-weight:900;
+}
 
 </style>>

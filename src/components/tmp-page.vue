@@ -28,5 +28,6 @@ export default {
 .box-inside{
     padding-left: 65px;
     padding-top:90px;
+    height: 100vh;
 }
 </style>
