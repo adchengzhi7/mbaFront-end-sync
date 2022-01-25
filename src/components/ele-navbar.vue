@@ -3,7 +3,9 @@
   <div class="container-fluid">
     <a class="navbar-brand" href="#">
       <img class="img-fluid" src="../assets/mba-logo.png" width="30" height="30" alt="">
+       <router-link :to="{ name: 'Home' }">
       <span class="ms-2 me-2 theme">特色學習登錄</span>
+      </router-link>
     </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -11,7 +13,8 @@
     <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
      <ul class="navbar-nav me-auto mb-2 mb-lg-0 "></ul>
      <div class="d-flex">
-       <avatar class="me-1 ms-1" :image="avatarImg" size="default" ></avatar>
+       <avatar class="me-1 ms-1" :image="avatar" size="default" :api="avatarImg" ></avatar>
+       
        <ul class="navbar-nav me-2">
        <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="navbarScrollingDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -38,7 +41,7 @@ import avatar from "./ele-avatar"
 export default {
   data() {
     return {
-      avatarImg:"http://placehold.it/64x64"
+      // avatarImg:"https://avatars.dicebear.com/v2/male/c99f18efa2fbc33e0090345423012607.svg"
     }
   },
   components:{
@@ -47,7 +50,8 @@ export default {
   methods: {
     ...mapActions({
       signOutAction:'auth/signOut',
-      checkTokenInvalid:'auth/checkTokenInvalid'
+      checkTokenInvalid:'auth/checkTokenInvalid',
+      avatarImg:'avatarImg'
     }),
     signOut(){
         this.signOutAction().then(() =>{
@@ -65,19 +69,22 @@ export default {
 
       }
       )
-
-
-    }
+    },
+   
   },
   computed:{
     ...mapGetters({
       authenticated:'auth/authenticated',
       user:'auth/user',
-      isInvalidToken:'auth/isInvalidToken'
-    })
+      userId:'auth/userId',
+      isInvalidToken:'auth/isInvalidToken',
+      avatar:'avatar'
+    }),
+    
   },
   mounted() {
     this.checkIsLogin()
+    this.avatarImg({id:this.user,type:"loginUser"})
   },
 }
 </script>
@@ -88,6 +95,12 @@ export default {
 .theme{
     color: #38b269;
   font-weight: 900;
+}
+a {
+    text-decoration: none;
+}
+.dropdown-menu > a:hover, .dropdown-menu > a:focus {
+   background-color:var(--hoverBgColor)
 }
 
 </style>

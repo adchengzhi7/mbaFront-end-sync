@@ -20,6 +20,9 @@ const routes = [
     path: '/',
     name: 'Home',
     component: Home,
+    meta:{
+      title:'特色學習登錄'
+    },
     beforeEnter: (to, from, next) => {
       if(store.getters['auth/authenticated'].token){
         if(store.getters['auth/authenticated'].userType == 0){return next({name:'Student'})}

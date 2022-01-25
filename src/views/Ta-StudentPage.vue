@@ -49,6 +49,7 @@ export default {
          name : null,
        } 
       if(vm.$store.state.student.studentData){
+        
         userData.name = vm.studentData.cName
       }
        

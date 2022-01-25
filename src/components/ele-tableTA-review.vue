@@ -100,8 +100,9 @@ export default {
          },
          dateShow(date){
              let gotDate =new Date(date);
+             gotDate.setHours(gotDate.getHours() - 8);
              let today = new Date()
-             const diffTimeStamp = today.getTime()- gotDate.getTime()
+             const diffTimeStamp = (today.getTime()- gotDate.getTime())+8
              const diffMin = Math.floor(diffTimeStamp / (1000*60)) ;
              const diffTime = Math.floor(diffTimeStamp / (1000*3600)) ;
              const diffDays = Math.floor(diffTimeStamp / (1000*3600*24)) ;

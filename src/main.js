@@ -16,7 +16,8 @@ import VueAxios from 'vue-axios'
 require("@/store/subscribers")
 store.dispatch('auth/attempt',localStorage.getItem('token'))    
 
-axios.defaults.baseURL='http://3.133.161.248:3000'
+// axios.defaults.baseURL='http://localhost:3000'
+axios.defaults.baseURL='https://www.apimbastudent.nccu.edu.tw/'
 const myapp =createApp(App);
 myapp.use(router)
 myapp.use(Vuex)

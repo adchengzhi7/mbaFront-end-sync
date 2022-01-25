@@ -7,10 +7,10 @@
           <form class="needs-validation " v-on:submit.prevent="submit()"   >
             <div class="p-3">
               <div class=" p-xl-3 p-md-3  p-sm-2 p-2  ">
-                <input class="  bg-light form-control" v-model="form.user" placeholder="輸入您的學號" name="" id=""  required/>
+                <input class="  bg-light form-control" v-model="form.user" @blur="isBlur= true" placeholder="輸入您的學號" name="" id=""  required/>
               </div>
               <div class="input-group p-xl-3 p-md-3  p-sm-2 p-2 ">
-                <input class="form-control" v-model="form.password" placeholder="Password" :type="passType" required >
+                <input class="form-control" v-model="form.password" placeholder="Password" @focus="isBlur= true" :type="passType" required >
                 <div class="input-group-append">
                   <button class="btn btn-icon" type="button" @click="showPassword">
                     <i v-if="see" class="fas fa-eye-slash"></i>
@@ -19,8 +19,18 @@
                   
                 </div>
               </div>
+              <div class=" p-xl-3 p-md-3  p-sm-2 p-2 text-primary" role="alert">
+                  <div>
+                <i class="fas fa-info-circle"></i>
+                    密碼為身份證字號10碼
+                  </div>
+                  <div class="small">
+                  （含大寫英文字母）
+                  </div>
+
+              </div>
               <div  class="font-weight-bold text-danger" v-if="!notFirstLogin">
-                {{ invalidUserMsg}}
+                <span :class="{'text-danger': invalidUserMsg != '成功登入' ,'text-success': invalidUserMsg == '成功登入'}">{{ invalidUserMsg}}</span>
               </div>
           </div>
         <div class="pt-3">
@@ -54,6 +64,7 @@ export default {
   data() {
     return {
       info:null,
+      isBlur:false,
       form:{
         user:null,
         password:null,

@@ -11,6 +11,9 @@ export default {
         isInvalidToken:null,
     },
     getters:{
+        token(state){
+            return state.token;
+        },
         authenticated(state){
             return ({
                     token:state.token,

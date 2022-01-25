@@ -1,10 +1,10 @@
 <template>
     <div class="p-5">
-        <div class="  alert alert-warning ">
-            <i class="fas fa-exclamation-circle "></i>
-            <a href="/"> 檔案範本</a>
-            只限CSV （儲存記得選擇 UTF-8 CSV，以免發生中文字體亂碼）
+        <div class="container text-end">
+
+                <button class="btn bg-shadow-hover  mt-3 mb-3 " @click="addAdmin"><i class="fas fa-cogs text-muted"></i> 新增助教</button>
         </div>
+            
         <div>
             <div  @dragover.prevent @drop.prevent>
                 <div class="container p-3 border-dash" @dragleave="fileDragOut" @dragover="fileDragIn" @drop="handleFileDrop" v-bind:style="{ 'background-color': color }">
@@ -26,6 +26,7 @@
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
+                    
                 </div>
             </div>
         </div>
@@ -33,6 +34,11 @@
        
        
        <div class="pt-3" :check="checkField">
+           <div class="container alert alert-warning ">
+                <i class="fas fa-exclamation-circle "></i>
+                <a href="/file/example.csv" download> 檔案範本</a>
+                只限CSV （儲存記得選擇 UTF-8 CSV，以免發生中文字體亂碼）
+            </div>
 
             <div v-if="countCsv !=0" class="btn btn-success success" @click="addUser">匯入名單</div>
 
@@ -56,6 +62,7 @@
 
 import {mapActions,mapGetters} from 'vuex'
 import {csv} from "csvtojson";  
+import axios from 'axios'
 
 export default {
     
@@ -74,7 +81,8 @@ export default {
 computed:{
     ...mapGetters({
         newStudentList:'student/newStudentList',
-        loadingPrecentage:'student/loadingPrecentage'
+        loadingPrecentage:'student/loadingPrecentage',
+        token:'auth/token'
     }),
     countCsv(){
         let vm =this;
@@ -137,8 +145,76 @@ methods: {
 ...mapActions({
     newStudent:'student/newStudent',
     setNewStudentNull:'student/setNewStudentNull',
-    insertStudentasList:'student/insertStudentasList'
+    insertStudentasList:'student/insertStudentasList',
+    
 }),
+    async addAdmin(){
+        let vm =this;
+        const { value: formValues } = await vm.$swal.fire({
+        icon:'info',
+        title: '新增助教',
+        footer: '<span class="title-blue "><i class="fas fa-info-circle"></i>  證號將為您的登入密碼</span>',
+        html:
+            '<input id="swal-input1" type="text" placeholder="姓名"class="form-control m-2">' +
+            '<input id="swal-input2" type="email" placeholder="輸入Email" class="form-control m-2" required>'+
+            '<input id="swal-input3" type="text" placeholder="輸入身分證號字號" class="form-control m-2">'+
+            '<input id="swal-input4" type="number" placeholder="輸入代號/學號" class="form-control m-2">',
+        focusConfirm: true,
+        confirmButtonColor: '#38b269',
+        confirmButtonText: '<i class="fas fa-plus"></i> 註冊用戶',
+         confirmButtonAriaLabel: '註冊用戶',
+        preConfirm: () => {
+            if(!document.getElementById('swal-input1').value || !document.getElementById('swal-input2').value||!document.getElementById('swal-input3').value||!document.getElementById('swal-input4').value){
+                let msg = '未輸入'
+                if (!document.getElementById('swal-input1').value) {
+                    msg = msg+' 姓名、';
+                }
+                if (!document.getElementById('swal-input2').value) {
+                      msg = msg+' Email、';
+                }
+                if (!document.getElementById('swal-input3').value) {
+                      msg = msg+' 身分證字號、';
+                }
+                if (!document.getElementById('swal-input4').value) {
+                      msg = msg+' 輸入代號/學號 ';
+                } 
+                    vm.$swal.showValidationMessage(msg)   
+
+            }
+
+            else {
+            return {
+                    email:document.getElementById('swal-input2').value,
+                    name: document.getElementById('swal-input1').value,
+                    personalid:document.getElementById('swal-input3').value,
+                    studentid:document.getElementById('swal-input4').value,
+                }
+            }
+
+        }
+        })
+
+        if (formValues) {
+            vm.insertAdmin(formValues)
+            .then((res)=>{
+                if(res.data.affectedRows){
+                    vm.$swal.fire({
+                        icon: 'success',
+                        title: '新增成功',
+                        text: '新增帳戶為：'+JSON.parse(res.config.data).studentid,
+                    })
+                }else{  
+                    vm.$swal.fire({
+                            icon: 'error',
+                            title: '發生錯誤',
+                            text: res.data.code,
+                        })
+
+                }
+            })
+          
+        }
+    },
     async getCsvData(input){
         let vm =this;
         if(input.target.files && input.target.files[0]){
@@ -148,7 +224,7 @@ methods: {
         const jsonArray = await csv().fromString(text);
         vm.jsonData = jsonArray;
         if(jsonArray.length === 0){
-            vm.setNewStudentNull();
+            vm.setNewStudentNull(); 
             vm.error="檔案資料格式錯誤"
              vm.iserror= true;
         }
@@ -164,6 +240,21 @@ methods: {
         }).then(
             vm.isDone ="匯入完成"
         )
+        
+    },
+    async insertAdmin(adminList){
+        try{
+           let result = await axios.post('/users/',adminList,
+                { 
+                headers:{'Authorization':'Bearer ' +this.token },
+                },)
+        return result;
+        }catch(e){
+            console.log(e);
+        }
+       
+        
+       
         
     },
 

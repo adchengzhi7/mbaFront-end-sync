@@ -1,7 +1,7 @@
 
 <template>
   <div > 
-     <div class="partTop mt-0 mt-md-5">
+     <div  class="partTop mt-0 mt-md-5">
        <div class="row m-0 mb-3">
          <div class="col d-none d-sm-block d-xl-block"></div>
          <div class="col-12 col-md-6">
@@ -19,12 +19,14 @@
          <div class="col-12 col-md-4 ">
            <div class="d-flex flex-wrap">
              <h5 class="font-weight-bold">待審核清單</h5>
-             <div v-if="unreviewPoints" >
-              <span class="danger float-left badge badge-pill badge-danger ">{{unreviewPoints.length}}</span>
-
+             <div  >
+                <span class="danger float-left badge badge-pill badge-danger " >
+                    <span v-if="unreviewPoints != null">{{unreviewPoints.length}}</span>
+                    <span v-else>0</span>
+                </span>
               </div>
             </div>
-           <div>
+           <div v-if="unreviewPoints">
              <div :key="item.id" v-for="item in unReviewListLimited" class="bg-shadow-hover review-box  pointer" @click="routerTo('TaStudentPage',item.stuId)">
                <div class="d-flex flex-wrap">
                  <div class="col-1  ">
@@ -53,8 +55,17 @@
               
              </div>
              <div class="text-center ">
-               <div class="m-2">
+               <div class="m-2 p-2">
                  <router-link to="review">查看更多</router-link>
+               </div>
+             </div>
+           </div>
+           <div v-else>
+             <div  class="bg-shadow-hover review-box  pointer">
+                <div class="d-flex flex-wrap">
+                <div class="col pl-0 text-center icon-disable ">
+                  <h3 class="font-weight-boldest m-0">尚無資料</h3>
+                </div>
                </div>
              </div>
            </div>
@@ -81,6 +92,7 @@ export default {
       authenticated:'auth/authenticated',
       unreviewPoints:'userPoint/unreviewPoints'
     }),
+   
     unReviewListLimited(){
       let vm = this;
       const unreviewPoints = vm.unreviewPoints;
@@ -112,6 +124,7 @@ export default {
         },
      dateShow(date){
              let gotDate =new Date(date);
+             gotDate.setHours(gotDate.getHours() - 8);
              let today = new Date()
              const diffTimeStamp = today.getTime()- gotDate.getTime()
              const diffMin = Math.floor(diffTimeStamp / (1000*60)) ;
@@ -129,29 +142,6 @@ data() {
       filter:"",
       currentPage:1,
       pageSize:5,
-      unReviewList:[{
-        id:"UR0",
-        user:{
-           name:"李正治",
-          stuId:"105306030",
-        },
-        type:"國際交換或雙聯學位",
-        date:"2021-02-22  22:30:00"
-
-      },
-      {
-        id:"UR1",
-        user:{
-           name:"李正治",
-          stuId:"105306032",
-        },
-        type:"國際交換或雙聯學位",
-        date:"2021-02-22  22:30:00"
-
-      }
-      ],
-      avatarImg:"http://placehold.it/64x64",
-      
     }
   },
   mounted() {
@@ -195,5 +185,93 @@ a{
     color:var(--green);
     font-weight:900;
 }
+/* HORIZONTAL */
 
+@-webkit-keyframes horizontal {
+  0% {
+    -webkit-transform: translate(0,0);
+    transform: translate(0,0);
+  }
+
+  6% {
+    -webkit-transform: translate(5px,0);
+    transform: translate(5px,0);
+  }
+
+  12% {
+    -webkit-transform: translate(0,0);
+    transform: translate(0,0);
+  }
+
+  18% {
+    -webkit-transform: translate(5px,0);
+    transform: translate(5px,0);
+  }
+
+  24% {
+    -webkit-transform: translate(0,0);
+    transform: translate(0,0);
+  }
+
+  30% {
+    -webkit-transform: translate(5px,0);
+    transform: translate(5px,0);
+  }
+
+  36% {
+    -webkit-transform: translate(0,0);
+    transform: translate(0,0);
+  }
+}
+
+@keyframes horizontal {
+  0% {
+    -webkit-transform: translate(0,0);
+    -ms-transform: translate(0,0);
+    transform: translate(0,0);
+  }
+
+  6% {
+    -webkit-transform: translate(5px,0);
+    -ms-transform: translate(5px,0);
+    transform: translate(5px,0);
+  }
+
+  12% {
+    -webkit-transform: translate(0,0);
+    -ms-transform: translate(0,0);
+    transform: translate(0,0);
+  }
+
+  18% {
+    -webkit-transform: translate(5px,0);
+    -ms-transform: translate(5px,0);
+    transform: translate(5px,0);
+  }
+
+  24% {
+    -webkit-transform: translate(0,0);
+    -ms-transform: translate(0,0);
+    transform: translate(0,0);
+  }
+
+  30% {
+    -webkit-transform: translate(5px,0);
+    -ms-transform: translate(5px,0);
+    transform: translate(5px,0);
+  }
+
+  36% {
+    -webkit-transform: translate(0,0);
+    -ms-transform: translate(0,0);
+    transform: translate(0,0);
+  }
+}
+
+.faa-horizontal.animated,
+.faa-horizontal.animated-hover:hover,
+.faa-parent.animated-hover:hover > .faa-horizontal {
+  -webkit-animation: horizontal 2s ease infinite;
+  animation: horizontal 2s ease infinite;
+}
 </style>>
