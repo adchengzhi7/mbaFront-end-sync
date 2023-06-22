@@ -35,7 +35,7 @@ jobs:
 
       - name: Copy File On Dist to Html 
         run: | 
-         sudo rsync -a /var/www/temp/dist /var/www/html/
+         sudo cp -R temp/dist/ html
          echo "Files copy ok"
 
       
