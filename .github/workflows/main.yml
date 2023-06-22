@@ -34,9 +34,9 @@ jobs:
          sudo git pull https://adchengzhi7:${{ secrets.MBASTUDENT }}@github.com/adchengzhi7/mbastudent.nccu.edu.tw-frontend.git main
          echo "Git pull ok"
 
-      # - name: Copy File On Dist to Html 
-      #   run: |  sudo rsync -a /var/www/temp/dist /var/www/html/
-      #   echo "Files copy ok"
+      - name: Copy File On Dist to Html 
+        run: |  sudo rsync -a /var/www/temp/dist /var/www/html/
+        echo "Files copy ok"
 
       
       # - name: Restart PM2
