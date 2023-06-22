@@ -31,7 +31,7 @@ jobs:
       - name: Git pull
         run: |
         
-         git pull https://adchengzhi7:${{ secrets.MBASTUDENT }}@github.com/adchengzhi7/mbastudent.nccu.edu.tw-frontend.git main
+         sudo git pull https://adchengzhi7:${{ secrets.MBASTUDENT }}@github.com/adchengzhi7/mbastudent.nccu.edu.tw-frontend.git main
          echo "Git pull ok"
 
       # - name: Copy File On Dist to Html 
