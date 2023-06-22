@@ -63,7 +63,7 @@ export default {
                 {id:"ST04",title:"商業競賽",icon:"competition",type:"4"},
                 {id:"ST05",title:"國內外志工",icon:"volunteer",type:"5"},
                 {id:"ST06",title:"企業專案研討",icon:"caseStudy",type:"6"},
-                {id:"ST07",title:"英語檢定",icon:"english",type:"7"},
+                {id:"ST07",title:"英語檢定1",icon:"english",type:"7"},
             ],
         }
     },
