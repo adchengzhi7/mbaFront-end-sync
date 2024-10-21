@@ -16,27 +16,28 @@ jobs:
       - name: Install Node.js  # 安裝 Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '16'
+          node-version: '16'  # 選擇適當的 Node.js 版本
 
       - name: Install dependencies and build  # 安裝依賴並構建項目
         run: |
           npm install
           npm run build  # 構建 Vue 項目，生成 dist 資料夾
 
-      - name: Show current directory  # 顯示當前目錄
+      - name: Check working directory  # 顯示當前工作目錄
         run: pwd
 
-      - name: List directory contents  # 列出當前目錄的內容
+      - name: List directory contents  # 列出目錄內容
         run: ls -la
 
       - name: List dist contents  # 檢查 dist 資料夾
-        run: ls ./dist
+        run: ls mbaFront-end-sync/dist
 
       - name: Sync dist to EC2  # 同步 dist 到 EC2
         uses: appleboy/ssh-action@v0.1.6
         with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ubuntu
-          key: ${{ secrets.EC2_SSH_KEY }}
+          host: ${{ secrets.EC2_HOST }}       # EC2 IP
+          username: ubuntu                    # EC2 使用者名稱
+          key: ${{ secrets.EC2_SSH_KEY }}     # SSH 私鑰
+          port: 22                            # SSH 端口
           script: |
-            rsync -av --delete ./dist/ /var/www/html/
+            rsync -av --delete mbaFront-end-sync/dist/ /var/www/html/  # 同步 dist 資料夾到 EC2 上的 /var/www/html/
