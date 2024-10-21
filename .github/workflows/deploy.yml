@@ -3,7 +3,7 @@ name: Deploy Vue Project to EC2
 on:
   push:
     branches:
-      - main  # 觸發條件：推送到 main 分支
+      - main  # 當推送到 main 分支時觸發
 
 jobs:
   deploy:
@@ -11,13 +11,16 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2  # 檢出推送的代碼
+        uses: actions/checkout@v2  # 檢出代碼
 
-      - name: Sync dist to EC2  # 同步 dist 資料夾到 EC2
-        uses: appleboy/ssh-action@v0.1.6
+      - name: Check dist exists  # 檢查 dist 資料夾是否存在
+        run: ls ./dist
+
+      - name: Sync dist to EC2
+        uses: appleboy/ssh-action@v0.1.6  # 使用 SSH 同步到 EC2
         with:
           host: ${{ secrets.EC2_HOST }}       # EC2 IP
-          username: ubuntu                  # EC2 使用者名稱
+          username: ubuntu                    # EC2 使用者名稱
           key: ${{ secrets.EC2_SSH_KEY }}     # SSH 私鑰
           script: |
-            rsync -av --delete ./dist/ /var/www/html/
+            rsync -av --delete ./dist/ /var/www/html/  # 同步 dist 資料夾到 EC2
