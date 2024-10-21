@@ -16,11 +16,11 @@ jobs:
       - name: Check dist exists  # 檢查 dist 資料夾是否存在
         run: ls ./dist
 
-      - name: Sync dist to EC2
-        uses: appleboy/ssh-action@v0.1.6  # 使用 SSH 同步到 EC2
+      - name: Sync dist to EC2  # 將本地 dist 同步到 EC2 的 /var/www/html
+        uses: appleboy/ssh-action@v0.1.6
         with:
           host: ${{ secrets.EC2_HOST }}       # EC2 IP
-          username: ubuntu                    # EC2 使用者名稱
+          username: ubuntu                    # EC2 使用者名稱（根據你的 EC2 使用者）
           key: ${{ secrets.EC2_SSH_KEY }}     # SSH 私鑰
           script: |
-            rsync -av --delete ./dist/ /var/www/html/  # 同步 dist 資料夾到 EC2
+            rsync -av --delete ./dist/ /var/www/html/  # 將 dist 資料夾同步到 EC2 上的 /var/www/html
