@@ -19,7 +19,7 @@ jobs:
         uses: appleboy/ssh-action@v0.1.6
         with:
           host: ${{ secrets.EC2_HOST }}  # EC2 IP，從 GitHub Secrets 獲取
-          username: ubuntu             # EC2 使用者
+          username: ubuntu            # EC2 使用者
           key: ${{ secrets.EC2_SSH_KEY }}  # SSH 私鑰，從 GitHub Secrets 獲取
           script: |
             # 將 dist 資料夾同步到 EC2 的 /var/www/html
