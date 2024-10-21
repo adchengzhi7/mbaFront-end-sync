@@ -3,24 +3,21 @@ name: Deploy Vue Project to EC2
 on:
   push:
     branches:
-      - main  # 當推送到 main 分支時觸發
+      - main  # 觸發條件：推送到 main 分支
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # 檢出當前的專案
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2  # 檢出推送的代碼
 
-      # 使用 SSH 同步 dist 資料夾到 EC2
-      - name: Sync dist to EC2
+      - name: Sync dist to EC2  # 同步 dist 資料夾到 EC2
         uses: appleboy/ssh-action@v0.1.6
         with:
-          host: ${{ secrets.EC2_HOST }}  # EC2 IP，從 GitHub Secrets 獲取
-          username: ubuntu          # EC2 使用者
-          key: ${{ secrets.EC2_SSH_KEY }}  # SSH 私鑰，從 GitHub Secrets 獲取
+          host: ${{ secrets.EC2_HOST }}       # EC2 IP
+          username: ec2-user                  # EC2 使用者名稱
+          key: ${{ secrets.EC2_SSH_KEY }}     # SSH 私鑰
           script: |
-            # 將 dist 資料夾同步到 EC2 的 /var/www/html
             rsync -av --delete ./dist/ /var/www/html/
