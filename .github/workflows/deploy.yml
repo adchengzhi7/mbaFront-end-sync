@@ -17,7 +17,7 @@ jobs:
         uses: appleboy/ssh-action@v0.1.6
         with:
           host: ${{ secrets.EC2_HOST }}       # EC2 IP
-          username: ec2-user                  # EC2 使用者名稱
+          username: ubuntu                  # EC2 使用者名稱
           key: ${{ secrets.EC2_SSH_KEY }}     # SSH 私鑰
           script: |
             rsync -av --delete ./dist/ /var/www/html/
