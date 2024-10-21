@@ -30,7 +30,7 @@ jobs:
         run: ls -la
 
       - name: List dist contents  # 檢查 dist 資料夾
-        run: ls mbaFront-end-sync/dist
+        run: ls dist/
 
       - name: Sync dist to EC2  # 同步 dist 到 EC2
         uses: appleboy/ssh-action@v0.1.6
@@ -40,4 +40,4 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}     # SSH 私鑰
           port: 22                            # SSH 端口
           script: |
-            rsync -av --delete mbaFront-end-sync/dist/ /var/www/html/  # 同步 dist 資料夾到 EC2 上的 /var/www/html/
+            rsync -av --delete dist/ /var/www/html/  # 同步 dist 資料夾到 EC2 上的 /var/www/html/
