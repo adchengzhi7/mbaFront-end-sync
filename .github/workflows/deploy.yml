@@ -13,6 +13,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2  # 檢出代碼
 
+      - name: Check working directory  # 檢查當前工作目錄
+        run: pwd
+
       - name: Check dist exists  # 檢查 dist 資料夾是否存在
         run: ls ./dist
 
@@ -20,7 +23,7 @@ jobs:
         uses: appleboy/ssh-action@v0.1.6
         with:
           host: ${{ secrets.EC2_HOST }}       # EC2 IP
-          username: ubuntu                    # EC2 使用者名稱（根據你的 EC2 使用者）
+          username: ubuntu                    # EC2 使用者名稱
           key: ${{ secrets.EC2_SSH_KEY }}     # SSH 私鑰
           script: |
             rsync -av --delete ./dist/ /var/www/html/  # 將 dist 資料夾同步到 EC2 上的 /var/www/html
