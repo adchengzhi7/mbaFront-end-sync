@@ -15,7 +15,7 @@
            </div>
   
            <div class="row m-0">
-             <div class="col-12 col-sm-6 p-1 col-md-4 p-md-3 " :key="item.id" v-for="item in sectionType" @click="toRoute(item)">
+             <div class="col-12 col-sm-6 p-1 col-md-4 p-md-3 " :key="item.id" v-for="item in filteredSectionType" @click="toRoute(item)">
                <div class="select-box bg-shadow-hover pointer ">
                   <img class="img-fluid" :src="require(`@/assets/icon/`+item.icon+`.svg`)" alt="">
                   <h6 class="font-weight-bold">{{item.title}}</h6>
@@ -39,19 +39,33 @@ export default {
         vm.$router.push({ name: 'StudentDash' })
       }
     },
-    computed:{
- ...mapGetters({
-      currentRegPointUser:'currentRegPointUser'
-    }),
+    computed: {
+      ...mapGetters({
+        currentRegPointUser: 'currentRegPointUser'
+      }),
+      filteredSectionType() {
+        return this.sectionType.filter(item => {
+          if (item.type === '8') {
+            return this.isTA;
+          }
+          return true;
+        });
+      }
     },
     methods: {
-      toRoute(item){
-        let vm = this;
-        if(!vm.isTA){
-          vm.$router.push({ name: 'StudentRegForm', params: { type: item.type, title:item.title,icon:item.icon} })
-        }else{
-          vm.$router.push({ name: 'TaRegForm', params: { type: item.type, title:item.title,icon:item.icon} })
-        }
+      toRoute(item) {
+          let vm = this;
+          if (!vm.isTA) {
+              vm.$router.push({ 
+                  name: 'StudentRegForm', 
+                  query: { type: item.type, title: item.title, icon: item.icon } 
+              });
+          } else {
+              vm.$router.push({ 
+                  name: 'TaRegForm', 
+                  query: { type: item.type, title: item.title, icon: item.icon } 
+              });
+          }
       }
     },
     data() {
@@ -64,6 +78,7 @@ export default {
                 {id:"ST05",title:"國內外志工",icon:"volunteer",type:"5"},
                 {id:"ST06",title:"企業專案研討",icon:"caseStudy",type:"6"},
                 {id:"ST07",title:"英語檢定",icon:"english",type:"7"},
+                {id:"ST08",title:"獎學金服務時數",icon:"scholarships",type:"8"},
             ],
         }
     },

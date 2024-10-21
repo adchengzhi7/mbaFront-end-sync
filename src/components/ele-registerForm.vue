@@ -1,127 +1,221 @@
 <template>
-    <div class="partTop">
-       <div class="row m-0 mt-3 mb-2  mt-md-5 mb-md-4">
-         <div class="col d-none d-sm-block d-xl-block align-self-center">
-              <div class="align-self-center" v-if="isTA" :isEdit="editDataByUser">
-                <h3 class="pointer hover" @click="$router.go(-1)">
-                    <i class="fas fa-arrow-left icon-clickable"></i>
-                </h3>
-            </div>
-         </div>
-         <div class="col-12 col-xl-9 col-md-9  col-sm-10 col-xs-12 align-self-center">
-             
-           <div class="d-flex">
-            
-             <div class="align-self-center">
-               <img v-if="pointType.icon == 'global' " class="img-fluid" src="../assets/icon/global.svg" alt="">
-               <img v-if="pointType.icon == 'intern' " class="img-fluid" src="../assets/icon/intern.svg" alt="">
-               <img v-if="pointType.icon == 'confrence' " class="img-fluid" src="../assets/icon/confrence.svg" alt="">
-               <img v-if="pointType.icon == 'competition' " class="img-fluid" src="../assets/icon/competition.svg" alt="">
-               <img v-if="pointType.icon == 'volunteer' " class="img-fluid" src="../assets/icon/volunteer.svg" alt="">
-               <img v-if="pointType.icon == 'caseStudy' " class="img-fluid" src="../assets/icon/caseStudy.svg" alt="">
-               <img v-if="pointType.icon == 'english' " class="img-fluid" src="../assets/icon/english.svg" alt="">
-             </div>
-             <div class="text-start align-self-center">
-               <h3 v-if="pointType" class="font-weight-boldest m-0   ">{{pointType.title}}</h3>
-               <div class="text-muted">請輸入完整的單位名稱</div>
-             </div>
-           </div>
-          
-          
-         </div>
-         <div class="col d-none d-sm-block d-xl-block"></div>
-         
-
+  <div class="partTop">
+     <div class="row m-0 mt-3 mb-2  mt-md-5 mb-md-4">
+       <div class="col d-none d-sm-block d-xl-block align-self-center">
+            <div class="align-self-center" v-if="isTA" :isEdit="editDataByUser">
+              <h3 class="pointer hover" @click="$router.go(-1)">
+                  <i class="fas fa-arrow-left icon-clickable"></i>
+              </h3>
+          </div>
        </div>
-       <div class="row m-0">
-           <div class="col d-none d-sm-block d-xl-block"></div>
-           <div class=" col-12 col-xl-9 col-md-9  col-sm-10 col-xs-12">
-               <form v-if="pointType.type != 7 " class="text-start needs-validation" v-on:submit.prevent="submit"> 
-                  <div class="row m-0">
-                       <div class="text-muted mb-3 h6 text-start" >
-                        學號： {{currentRegPointUser}}
-                      </div>
-                      <div class="col input-col">
-                          <select class="form-control" name="" id="year" v-model="yearSelected">
-                            <option value="none" class="select-default" id="0" disabled >選擇學年</option>
-                            <option :id="'year'+year" :key="'year'+year" v-for="year in getYear" :value="year"> {{year}} 學年</option>
-                          </select>
-                          <div class="invalid-feedback">
-                            請選擇選擇學年
-                          </div>
-                      </div>
-                      <div class="col input-col">
-                          <select class="form-control" name="" id="semester" v-model="semesterSelected"  :class="{'is-invalid':isSelectedNull && selectedBlured ,'is-valid':!isSelectedNull &&selectedBlured }" @blur="selectedBlured = true">
-                            <option id="semester0"  value="none" class=" select-default" disabled  >選擇學期</option>
-                            <option id="semester1"  value="1">1</option>
-                            <option id="semester2" value="2">2</option>
-                          </select>
-                          <div class="invalid-feedback">
-                            請選擇選擇學期
-                          </div>
-                      </div>
-                  </div>
-                  <div class="row m-0">
-                    <div class="col input-col">
-                    <input class="form-control" :class="{'is-invalid':isSectionNull && sectionBlured,'is-valid':!isSectionNull &&sectionBlured }" @blur="sectionBlured = true" type="text" v-model="sectionTitle" placeholder="請輸入完整單位名稱" >
-                          <div class="invalid-feedback">
-                            請輸入完整的單位名稱
-                          </div>
-                    </div>
-                  </div>
-                  
-                  <div class="row m-0" >
-                    <div class="col input-col" v-if="isTA">
-                      
-                        <div class="input-group ">
-                            <button class="btn btn-secondary" type="button" @click="minusPoints" >
-                              <i class="fas fa-minus"></i>
-                            </button>
-                            <input class="form-control" :class="{'is-invalid':isNumberTooLarge && numberBlured,'is-valid':!isNumberTooLarge &&numberBlured }" @blur="numberBlured = true" type="number" max="2"  v-model="checkPoint"  >
-                            <button class="btn btn-secondary " type="button" @click="addPoints" >
-                              <i class="fas fa-plus"></i>
-                            </button>
-                        </div>
-                         <div class="invalid-feedback">
-                            點數不可大於2
-                          </div>
-                    </div>
-                    <div class="mt-3" :class="{'d-grid gap-2':isDisplaySmall==true}">
-                      <button v-if="!isEdit" class="btn btn-success btn-lg success " >提交申請</button>
-                      <button v-else class="btn btn-success btn-lg success " >保存變更</button>
-                    </div>
-                  </div>
-              </form>
+       <div class="col-12 col-xl-9 col-md-9  col-sm-10 col-xs-12 align-self-center">
+           
+         <div class="d-flex">
+          
+           <div class="align-self-center">
+             <img v-if="pointType.icon == 'global' " class="img-fluid" src="../assets/icon/global.svg" alt="">
+             <img v-if="pointType.icon == 'intern' " class="img-fluid" src="../assets/icon/intern.svg" alt="">
+             <img v-if="pointType.icon == 'confrence' " class="img-fluid" src="../assets/icon/confrence.svg" alt="">
+             <img v-if="pointType.icon == 'competition' " class="img-fluid" src="../assets/icon/competition.svg" alt="">
+             <img v-if="pointType.icon == 'volunteer' " class="img-fluid" src="../assets/icon/volunteer.svg" alt="">
+             <img v-if="pointType.icon == 'caseStudy' " class="img-fluid" src="../assets/icon/caseStudy.svg" alt="">
+             <img v-if="pointType.icon == 'english' " class="img-fluid" src="../assets/icon/english.svg" alt="">
+             <img v-if="pointType.icon == 'scholarships' " class="img-fluid" src="../assets/icon/scholarships.svg" alt="">
+           </div>
+           <div class="text-start align-self-center">
+             <h3 v-if="pointType" class="font-weight-boldest m-0   ">{{pointType.title}}</h3>
+             <div class="text-muted">請輸入完整的單位名稱</div>
+           </div>
+         </div>
+        
+        
+       </div>
+       <div class="col d-none d-sm-block d-xl-block"></div>
+       
 
-              <div v-else class="text-start">
+     </div>
+     <div class="row m-0">
+         <div class="col d-none d-sm-block d-xl-block"></div>
+         <div class=" col-12 col-xl-9 col-md-9  col-sm-10 col-xs-12">
+             <!-- 表單 1-6 -->
+             <form v-if="pointType.type != 7 && pointType.type != 8" class="text-start needs-validation" v-on:submit.prevent="submit"> 
                 <div class="row m-0">
-                    <div class="text-muted mb-3 h6 text-start" >
+                     <div class="text-muted mb-3 h6 text-start">
                       學號： {{currentRegPointUser}}
                     </div>
                     <div class="col input-col">
-                        <select class="form-control" name="" id="" v-model="englishSelected" :class="{'is-invalid':isEnglishSelectedNull && englishSelectedBlured,'is-valid':!isEnglishSelectedNull &&englishSelectedBlured }" @blur="englishSelectedBlured = true">
-                          <option value="none" disabled  >選擇英語檢定類別</option>
-                          <option :key="'test-'+test" v-for="test in englishTest" :value="test"> {{test}} </option>
+                        <select class="form-control" 
+                        v-model="yearSelected"
+                        @blur="yearBlured = true"
+                        :class="{'is-invalid': isYearNull && yearBlured, 'is-valid': !isYearNull && yearBlured }"
+                        >
+                          <option value="none" disabled>選擇學年</option>
+                          <option :id="'year'+year" :key="'year'+year" v-for="year in getYear" :value="year"> {{year}} 學年</option>
                         </select>
+                        <div class="invalid-feedback">請選擇學年</div>
                     </div>
-                    
+                    <div class="col input-col">
+                        <select class="form-control" 
+                        v-model="semesterSelected"
+                        @blur="semesterBlured = true"
+                        :class="{'is-invalid': isSemesterNull && semesterBlured, 'is-valid': !isSemesterNull && semesterBlured }">
+                        >
+                          <option value="none" disabled>選擇學期</option>
+                          <option value="1">1</option>
+                          <option value="2">2</option>
+                        </select>
+                        <div class="invalid-feedback">請選擇學期</div>
+                    </div>
                 </div>
                 <div class="row m-0">
                   <div class="col input-col">
-                    <input class="form-control" type="number" v-model="englishPoint" :class="{'is-invalid':isEnglishPointNull && englishPointBlured,'is-valid':!isEnglishPointNull &&englishPointBlured }" @blur="englishPointBlured = true"  placeholder="輸入英語檢定分數">
-                  </div>
-                  <div class="invalid-feedback">請輸入英語檢定分數 </div>
-                  <div class="mt-3" :class="{'d-grid gap-2':isDisplaySmall==true}">
-                    <button v-if="!isEdit" class="btn btn-success btn-lg success " @click="submitEnglish">提交申請</button>
-                    <button v-else class="btn btn-success btn-lg success " @click="submitEnglish">保存變更</button>
+                  <input class="form-control" type="text" 
+                  v-model="sectionTitle" 
+                  placeholder="請輸入完整單位名稱"
+                  @blur="sectionBlured = true"
+                  :class="{'is-invalid': isSectionNull && sectionBlured, 'is-valid': !isSectionNull && sectionBlured }"
+                  >
+                        <div class="invalid-feedback">請輸入完整單位名稱</div>
                   </div>
                 </div>
                 
+                <div class="row m-0">
+                  <div class="col input-col" v-if="isTA">
+                    
+                      <div class="input-group">
+                          <button class="btn btn-secondary" type="button" @click="minusPoints">
+                            <i class="fas fa-minus"></i>
+                          </button>
+                          <input 
+                          class="form-control" 
+                          type="number" max="2" 
+                          v-model="checkPoint"
+                          @blur="numberBlured = true"
+                          :class="{'is-invalid': isNumberTooLarge && numberBlured, 'is-valid': !isNumberTooLarge && numberBlured }">
+                          >
+                          <button class="btn btn-secondary" type="button" @click="addPoints">
+                            <i class="fas fa-plus"></i>
+                          </button>
+                      </div>
+                       <div class="invalid-feedback">點數不可大於2</div>
+                  </div>
+                  <div class="mt-3" :class="{'d-grid gap-2':isDisplaySmall}">
+                    <button v-if="!isEdit" class="btn btn-success btn-lg">提交申請</button>
+                    <button v-else class="btn btn-success btn-lg">保存變更</button>
+                  </div>
+                </div>
+            </form>
+
+            <!-- 表單 8 獎學金服務時數 -->
+            <div v-if="pointType.type == 8" class="text-start needs-validation" > 
+              <div class="row m-0">
+                <div class="text-muted mb-3 h6 text-start">
+                  學號： {{currentRegPointUser}}
+                </div>
+
+                <!-- 學年選擇 -->
+                <div class="col input-col">
+                  <select 
+                    class="form-control" 
+                    v-model="yearSelected"
+                    @blur="yearBlured = true"
+                    :class="{'is-invalid': isYearNull && yearBlured, 'is-valid': !isYearNull && yearBlured }"
+                    >
+                    <option value="none" disabled>選擇學年</option>
+                    <option :id="'year'+year" :key="'year'+year" v-for="year in getYear" :value="year"> {{year}} 學年</option>
+                  </select>
+                  <div class="invalid-feedback">請選擇學年</div>
+                </div>
+                <!-- 學期選擇 -->
+                <div class="col input-col">
+                  <select 
+                    class="form-control" 
+                    v-model="semesterSelected"
+                    @blur="semesterBlured = true"
+                    :class="{'is-invalid': isSemesterNull && semesterBlured, 'is-valid': !isSemesterNull && semesterBlured }">
+                    >
+                    <option value="none" disabled>選擇學期</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                  </select>
+                  <div class="invalid-feedback">請選擇學期</div>
+                </div>
               </div>
-           </div>
-           <div class="col d-none d-sm-block d-xl-block"></div>
-       </div>
+
+              <!-- 單位名稱 -->
+              <div class="row m-0">
+                <div class="col input-col">
+                  <input 
+                    class="form-control" 
+                    type="text" 
+                    v-model="sectionTitle" 
+                    @blur="sectionBlured = true"
+                    :class="{'is-invalid': isSectionNull && sectionBlured, 'is-valid': !isSectionNull && sectionBlured }"
+                    placeholder="請輸入服務活動名稱">
+                  <div class="invalid-feedback">請輸入服務活動名稱</div>
+                </div>
+              </div>
+              <!-- 服務時數輸入框 -->
+              <div class="row m-0">
+                <div class="col input-col">
+                  <input class="form-control" 
+                  type="number" 
+                  v-model="scholarshipHours" 
+                  @blur="hoursBlured = true"
+                  :class="{'is-invalid': isHoursNull && hoursBlured, 'is-valid': !isHoursNull && hoursBlured }"
+                  placeholder="請輸入服務時數">
+                  <div class="invalid-feedback">請輸入服務時數</div>
+                </div>
+              </div>
+
+              <!-- 提交按鈕 -->
+              <div class="row m-0">
+                <div class="mt-3" :class="{'d-grid gap-2':isDisplaySmall}">
+                  <button v-if="!isEdit" class="btn btn-success btn-lg" @click="submitScholarships">提交申請</button>
+                  <button v-else class="btn btn-success btn-lg" @click="submitScholarships">保存變更</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 表單 7 英語檢定 -->
+            <div v-if="pointType.type == 7" class="text-start">
+              <div class="row m-0">
+                <div class="text-muted mb-3 h6 text-start">
+                  學號： {{currentRegPointUser}}
+                </div>
+                <div class="col input-col">
+                  <select 
+                    class="form-control" 
+                    v-model="englishSelected"
+                    @blur="englishSelectedBlured = true"
+                    :class="{'is-invalid': isEnglishSelectedNull && englishSelectedBlured, 'is-valid': !isEnglishSelectedNull && englishSelectedBlured }">
+                  >
+                    <option value="none" disabled>選擇英語檢定類別</option>
+                    <option :key="'test-'+test" v-for="test in englishTest" :value="test"> {{test}} </option>
+                  </select>
+                </div>
+              </div>
+              <div class="row m-0">
+                <div class="col input-col">
+                  <input 
+                  class="form-control"
+                  type="number" 
+                  v-model="englishPoint" 
+                  @blur="englishPointBlured = true"
+                  :class="{'is-invalid': isEnglishPointNull && englishPointBlured, 'is-valid': !isEnglishPointNull && englishPointBlured }"
+                  placeholder="輸入英語檢定分數">
+                  <div class="invalid-feedback">請輸入英語檢定分數</div>
+                </div>
+                <div class="mt-3" :class="{'d-grid gap-2':isDisplaySmall}">
+                  <button v-if="!isEdit" class="btn btn-success btn-lg" @click="submitEnglish">提交申請</button>
+                  <button v-else class="btn btn-success btn-lg" @click="submitEnglish">保存變更</button>
+                </div>
+              </div>
+            </div>
+         </div>
+         <div class="col d-none d-sm-block d-xl-block"></div>
      </div>
+   </div>
 </template>
 <script>
 import {mapGetters,mapActions} from 'vuex'
@@ -143,6 +237,8 @@ export default {
         points:1,
         status:1,
         semesterSelected:"none",
+        scholarshipHours: '', // 獎學金服務時數
+        hoursBlured: false,
         englishPoint:"",
         englishSelected:"none",
         englishTest:["TOEFL PBT","TOEFL CBT","TOEFL IBT","IELTS","TOEIC"],
@@ -193,6 +289,18 @@ export default {
       let vm = this;
       if(vm.sectionTitle == "" || vm.sectionTitle == null ){ return true}
       else{return false}
+    },
+    isYearNull() {
+      let vm = this;
+      return vm.yearSelected === 'none' || vm.yearSelected === null;
+    },
+    isSemesterNull() {
+      let vm = this;
+      return vm.semesterSelected === 'none' || vm.semesterSelected === null;
+    },
+    isHoursNull() {
+      let vm = this;
+      return vm.scholarshipHours === '' || vm.scholarshipHours === null || vm.scholarshipHours <= 0;
     },
     isNumberTooLarge(){
       let vm = this;
@@ -299,6 +407,18 @@ export default {
        }
        
      },
+     //這裡繼續，還沒寫完
+     validateScholarships(){
+       let vm =this;
+       vm.hoursBlured =true;
+       vm.sectionBlured =true;
+       vm.semesterBlured =true;
+       vm.yearBlured =true;
+         if(vm.checkInputStatus(vm.scholarshipHours) && vm.checkInputStatus(vm.sectionTitle) && vm.checkInputStatus(vm.semesterSelected) && vm.checkInputStatus(vm.yearSelected)  ){
+         vm.valid = true
+       }
+       
+     },
      checkInputStatus : function(email) {
         if(email == "" || email == null  || email=="none" || email==0 ){ return false}
         else{return true}
@@ -375,6 +495,53 @@ export default {
      
        vm.validateEnglish();
        if(vm.valid && !vm.isEdit){
+        vm.insertUserPoint(pointList).then((res)=>{
+          if(res.data.success == 1){
+            if(!vm.isTA){
+              vm.showAlert("StudentDash",vm.studentDoneMessage,null)
+            }else {
+              vm.showAlert("TaStudentPage",vm.taDoneMessage,vm.currentRegPointUser)
+            }
+          }else{
+            //show error modal
+          }
+        })
+      }
+       if(vm.valid && vm.isEdit){
+        pointList.pointsId = vm.pointData.pointId;
+        vm.updatePointByPointId(pointList).then((res)=>{
+          console.log(res);
+          if(res.data.success == 1){
+            if(!vm.isTA){
+              vm.showAlert("StudentDash",vm.editMessage,null)
+            }else {
+              vm.showAlert("TaStudentPage",vm.taDoneMessage,vm.currentRegPointUser)
+
+            }
+          }else{
+            alert("unvalid")
+          }
+        })
+      }
+    },
+    //還沒有寫後端
+    submitScholarships() {
+      let vm =this;
+      let insertDate = vm.currentTime();
+      const pointList = {
+        sectionTitle: vm.sectionTitle,
+        yearSelected: vm.yearSelected,
+        points : 0,
+        semesterSelected: vm.semesterSelected,
+        type: vm.pointType.type,
+        status: 2,
+        stuId: vm.currentRegPointUser,
+        englishCredit: null,
+        scholarshipHours: vm.scholarshipHours,
+        insertDate: insertDate,
+      };
+      vm.validateScholarships();
+      if(vm.valid && !vm.isEdit){
         vm.insertUserPoint(pointList).then((res)=>{
           if(res.data.success == 1){
             if(!vm.isTA){

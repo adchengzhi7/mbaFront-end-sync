@@ -87,18 +87,18 @@ export default {
             commit('SET_USER',null)
             localStorage.removeItem('token')
         },
-        async checkTokenInvalid({commit},state){
-            await axios.get('/users/check',{ 
-                headers:{'Authorization':'Bearer ' + state.token }
-             })
-            .then((res)=> {
-                commit('SET_ISINVALIDTOKEN',false)
+        async checkTokenInvalid({ commit, state }) {
+            await axios.get('/users/check', {
+                headers: { 'Authorization': 'Bearer ' + state.token }
+            })
+            .then((res) => {
+                commit('SET_ISINVALIDTOKEN', false);
                 console.log(res);
             })
-            .catch((error)=>{
-                commit('SET_ISINVALIDTOKEN',true)
+            .catch((error) => {
+                commit('SET_ISINVALIDTOKEN', true);
                 console.log(error);
-            })
+            });
         }
         
     },
