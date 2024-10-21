@@ -13,9 +13,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2  # 檢出代碼
 
-      - name: Change working directory  # 切換到包含 dist 的工作目錄
-        run: cd mbaFront-end-sync
-
       - name: Check dist exists  # 檢查 dist 資料夾是否存在
         run: ls ./dist
 
