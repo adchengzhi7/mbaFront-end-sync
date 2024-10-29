@@ -29,7 +29,7 @@
 import {mapGetters} from 'vuex'
 
 export default {
-    props:['isTA'],
+    props:['isTA','isSub'],
     mounted() {
       let vm =this;
       if(!vm.currentRegPointUser && vm.isTA){
@@ -46,7 +46,7 @@ export default {
       filteredSectionType() {
         return this.sectionType.filter(item => {
           if (item.type === '8') {
-            return this.isTA;
+            return this.isTA && this.isSub;
           }
           return true;
         });

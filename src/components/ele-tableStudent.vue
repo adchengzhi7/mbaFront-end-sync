@@ -3,8 +3,8 @@
         <customTable>
            
             <template #thead>
-                  <tr>
-                    <th class="" :key="th.key" v-for="th in thead" @click ="sortSelector(th.id,th.isSort)" :class="{'text-center':isDisplaySmall==true}"   scope="col">
+                <tr v-if="isSub" >
+                    <th  class="" :key="th.key" v-for="th in theadSub" @click ="sortSelector(th.id,th.isSort)" :class="{'text-center':isDisplaySmall==true}"   scope="col">
                         <span :class="{'title-green':sortBy == th.id}">
                             {{th.title}}
                             <i v-if="sortBy == th.id && isReverse== false" class="fas fa-sort-down"></i>
@@ -17,6 +17,22 @@
                 
                     <th></th>
                 </tr>
+                <tr v-else >
+                    <th  class="" :key="th.key" v-for="th in thead" @click ="sortSelector(th.id,th.isSort)" :class="{'text-center':isDisplaySmall==true}"   scope="col">
+                        <span :class="{'title-green':sortBy == th.id}">
+                            {{th.title}}
+                            <i v-if="sortBy == th.id && isReverse== false" class="fas fa-sort-down"></i>
+                            <i v-else-if="sortBy == th.id && isReverse== true" class="fas fa-sort-up"></i>
+                            <span v-else-if="!th.isSort"></span>
+                            <i v-else class="fas fa-sort"></i>
+                        </span>
+
+                    </th>
+                
+                    <th></th>
+                </tr>
+                    
+
             </template>
             <template #tbody>
                 <tr class="bg-shadow-hover rounded " :key="index" v-for="(item,index) in filterData">
@@ -32,6 +48,9 @@
                     </td>
                     <td class="align-middle" :class="{'text-center':isDisplaySmall==true}" >{{splitAndJoin(item.semester)}}</td>
                     <td class="align-middle" :class="{'text-center':isDisplaySmall==true}"  v-html="(item.point)"></td>
+                    <td v-if="isSub" class="align-middle" :class="{'text-center':isDisplaySmall==true}" >
+                        {{ item.scholarshipHours === null || item.scholarshipHours === 0 ? '-' : item.scholarshipHours }}
+                    </td>
                     <td class="align-middle" :class="{'text-center':isDisplaySmall==true}" >
                         <span v-if="item.status == 1">
                             <button class="font-weight-bold" :class="{'badge bg-success border-0':isDisplaySmall==true,'btn btn-outline-secondary ':isDisplaySmall==false}"> 待審核</button>
@@ -85,7 +104,7 @@ import customTable from "./tmp-table";
 import { mapGetters,mapActions} from 'vuex'
 
 export default {
-    props:["isTA","stuId"],
+    props:["isTA","isSub","stuId"],
     components:{
         customTable
     },
@@ -237,9 +256,16 @@ export default {
                 {key:'th02',id:"section",title:"項目",isSort:false},
                 {key:'th03',id:"semester",title:"學期",isSort:true},
                 {key:'th04',id:"point",title:"點數",isSort:true},
-                {key:'th05',id:"status",title:"狀態",isSort:true},
+                {key:'th06',id:"status",title:"狀態",isSort:true},
                 ],
-                
+            theadSub:
+                [
+                {key:'th02',id:"section",title:"項目",isSort:false},
+                {key:'th03',id:"semester",title:"學期",isSort:true},
+                {key:'th04',id:"point",title:"點數",isSort:true},
+                {key:'th05',id:"scholarshipHours",title:"時數",isSort:true},
+                {key:'th06',id:"status",title:"狀態",isSort:true},
+                ],    
             nameList:[
                 {id:"1",section:"",section_title:"",semester:"",point:"",status:""},
             ]

@@ -237,7 +237,7 @@ export default {
         points:1,
         status:1,
         semesterSelected:"none",
-        scholarshipHours: '', // 獎學金服務時數
+        scholarshipHours: 0, // 獎學金服務時數
         hoursBlured: false,
         englishPoint:"",
         englishSelected:"none",

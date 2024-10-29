@@ -4,7 +4,7 @@
        <div class="row m-0">
         <div class="col d-none d-sm-block d-xl-block "></div>
         <div class="col-12 col-xl-9 col-md-9  col-sm-10 col-xs-12 row">
-            <div class="col-12 col-md-6">
+            <div class="col-12 col-md-6 cus-dflex" >
                 <div class="d-flex  justify-content-center ">
                 <avatar :image="img(userData.name)" size="lg"></avatar>
                 <div class=" avatar-box">
@@ -23,6 +23,15 @@
                   </div>
                   <div class="progress">
                   <div class="progress-bar success" role="progressbar" :style="{'width':totalPointToPrecent }" :aria-valuenow="totalPointToPrecent" aria-valuemin="0" aria-valuemax="100"></div>
+                  </div>
+              </div>
+              <div v-if="isSub" class="avatar-box p-0 p-md-3 ">
+                  <div class="d-flex flex-wrap pb-3 ">
+                  <div >已服務時數</div>
+                  <div class="ms-auto" >{{totalHours}}/160</div>
+                  </div>
+                  <div class="progress">
+                  <div class="progress-bar success" role="progressbar" :style="{'width':totalHoursToPrecent }" :aria-valuenow="totalHoursToPrecent" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
               </div>
             </div>
@@ -66,10 +75,11 @@ import tables from "../components/ele-tableStudent"
 import {mapActions,mapGetters} from "vuex"
 
 export default {
-    props:["isTA","userData","userPoints"],
+    props:["isTA","isSub","userData","userPoints"],
     data() {
         return {
             finalPoints:0,
+            finalHours:0,
             // avatarImg:"",
            }
     },
@@ -115,10 +125,38 @@ export default {
        }
       return 0;
     },
+    totalHours(){
+      let vm =this; 
+      if(vm.userPoints){  
+        const pointArray=Object.values(vm.userPoints).map(
+          function(item) {
+            if(item.status ==2){
+              return item.scholarshipHours
+            }
+            return 0
+          }
+            
+        );
+        try{
+
+          return vm.finalHours= pointArray.reduce((sum,key)=> sum+key)
+        }catch(e){
+          // console.log(e);
+          return vm.finalHours=0;
+          }
+       }
+      return 0;
+    },
     totalPointToPrecent(){
       let vm =this;
       const pointPercent = vm.finalPoints/ 3 *100;
       return pointPercent.toString()+"%";
+      
+    },
+    totalHoursToPrecent(){
+      let vm =this;
+      const hourPercent = vm.finalHours/ 160 *100;
+      return hourPercent.toString()+"%";
       
     }
   },
@@ -236,5 +274,9 @@ export default {
 	width: 5px;
 	height: 5px;
 
+}
+.cus-dflex{
+  display: flex;
+  align-items: center;
 }
 </style>

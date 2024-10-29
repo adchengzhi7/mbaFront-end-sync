@@ -1,6 +1,6 @@
 <template>
   <div > 
-     <student-page :key="ConfirmGetUserId" :userData="userData" :isTA="isTA" :userPoints="userPoints"></student-page>
+     <student-page :key="ConfirmGetUserId" :userData="userData" :isTA="isTA" :isSub="isSub" :userPoints="userPoints"></student-page>
   </div>
 </template>
 
@@ -36,6 +36,7 @@ export default {
        if(this.$store.state.auth.userType == 0) return false
        else return true
      },
+     
      ConfirmGetUserId(){
       if(this.$route.query.stuId){
            return this.getPointsData(this.$route.query.stuId)
@@ -47,15 +48,28 @@ export default {
       let userData ={
          stuId : vm.$route.query.stuId,
          name : null,
+         type: null,
        } 
       if(vm.$store.state.student.studentData){
         
         userData.name = vm.studentData.cName
+        userData.type = vm.studentData.type
+        
+        
       }
        
        return userData
 
-     }
+     },
+     isSub() {
+      let vm = this;
+      // 確認 studentData 存在並檢查 type 是否為 -1
+      if (vm.$store.state.student.studentData && vm.$store.state.student.studentData.type === -1) {
+        return true;
+      } else {
+        return false;
+      }
+    }
      
   },
   
@@ -96,4 +110,4 @@ data() {
 
 
 
-</style>>
+</style>

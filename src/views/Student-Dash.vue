@@ -1,6 +1,6 @@
 <template>
   <div > 
-     <student-page :key="ConfirmGetUserId" :isTA="isTA" :userData="userData" :userPoints="userPoints" ></student-page>
+     <student-page :key="ConfirmGetUserId" :isTA="isTA"  :isSub="isSub" :userData="userData" :userPoints="userPoints" ></student-page>
   
   </div>
 </template>
@@ -35,7 +35,18 @@ computed:{
 
           }
           return null
-     }
+     },
+
+     isSub() {
+      let vm = this;
+      // 確認 studentData 存在並檢查 type 是否為 -1
+      if (vm.$store.state.student.studentData && vm.$store.state.student.studentData.type === -1) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+     
   },
   components:{
     studentPage,
