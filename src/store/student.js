@@ -106,19 +106,13 @@ import auth from './auth'
             dispatch("setProgressNull");
 
         },
-        async updateStudent({dispatch},data){
-            await axios.patch('/users/',data,{ 
-                headers:{'Authorization':'Bearer ' +auth.state.token },
-             },)
-             .then(function (response) {
-                dispatch("getStudentDataById",data.studentid)
-                return response.status;
-              })
-              .catch(function (error) {
-                   throw error;
-              })    
+        async updateStudent({dispatch}, data) {
+            let response = await axios.patch('/users/', data, { 
+              headers: { 'Authorization': 'Bearer ' + auth.state.token },
+            });
             
-
+            await dispatch("getStudentDataById", data.studentid);  // 確保資料更新後重新加載
+            return response.status;
         },
         setNewStudentNull({commit,dispatch}){
             commit('SET_NEWSTUDENTLIST',null)

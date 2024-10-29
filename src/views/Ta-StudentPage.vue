@@ -54,6 +54,8 @@ export default {
         
         userData.name = vm.studentData.cName
         userData.type = vm.studentData.type
+        userData.pId = vm.studentData.psId
+        userData.email= vm.studentData.email
         
         
       }

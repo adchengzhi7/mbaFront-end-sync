@@ -189,7 +189,14 @@ export default {
         title: '修改資訊',
         html:
             '<input id="swal-input1" type="text" value="'+vm.userData.name +'" placeholder="姓名"class="form-control m-2">' +
-            '<input id="swal-input4" type="number" value="'+vm.userData.stuId +'" disabled placeholder="輸入代號/學號" class="form-control m-2">',
+            '<input id="swal-input4" type="number" value="'+vm.userData.stuId +'" disabled placeholder="輸入代號/學號" class="form-control m-2">' +
+            '<input id="swal-input2" type="text" value="'+vm.userData.email +'" placeholder="電子郵件"class="form-control m-2">' +
+            '<input id="swal-input3" type="text" value="'+vm.userData.pId +'" placeholder="身分證號/居留證號" class="form-control m-2">' +
+            '<div class="form-check m-2 text-start">' +
+            '  <input id="swal-input-checkbox" class="form-check-input" type="checkbox" '+ (vm.userData.type === -1 ? 'checked' : '') + '>' +
+            '  <label class="form-check-label" for="swal-input-checkbox">獎學金學生</label>' +
+            '</div>' ,
+
         focusConfirm: true,
         confirmButtonColor: '#38b269',
         confirmButtonText: '<i class="fas fa-save"></i> 更新資料',
@@ -201,40 +208,49 @@ export default {
                     msg = msg+' 姓名、';
                 }
                 if (!document.getElementById('swal-input4').value) {
-                      msg = msg+' 輸入學號 ';
+                      msg = msg+' 學號、 ';
+                } 
+                if (!document.getElementById('swal-input2').value) {
+                    msg = msg+' 電子郵件、';
+                }
+                if (!document.getElementById('swal-input3').value) {
+                      msg = msg+' 身分證號/居留證號 ';
                 } 
                     vm.$swal.showValidationMessage(msg)   
 
             }
             else {
+            // 判斷 checkbox 是否選中，若選中則 type 設置為 -1，否則為 0
+            const typeValue = document.getElementById('swal-input-checkbox').checked ? -1 : 0;
             return {
-                    name: document.getElementById('swal-input1').value,
-                    studentid:document.getElementById('swal-input4').value,
-                }
+                name: document.getElementById('swal-input1').value,
+                studentid: document.getElementById('swal-input4').value,
+                email: document.getElementById('swal-input2').value,
+                pId: document.getElementById('swal-input3').value,
+                type: typeValue  // 傳回選擇的 type 值
+            };
             }
 
         }
         })
-
+        
         if (formValues) {
-          console.log(formValues);
-            vm.updateStudent(formValues);
-            // .then((res)=>{
-            //     if(res.data.affectedRows){
-            //         vm.$swal.fire({
-            //             icon: 'success',
-            //             title: '修改完畢',
-            //             text: '修改資料為：'+JSON.parse(res.config.data),
-            //         })
-            //     }else{  
-            //         vm.$swal.fire({
-            //                 icon: 'error',
-            //                 title: '發生錯誤',
-            //                 text: res.data.code,
-            //             })
+            vm.updateStudent(formValues).then((res)=>{
+              console.log(res)
+                if(res == 200){
+                    vm.$swal.fire({
+                        icon: 'success',
+                        title: '修改完畢',
+                    })
+                }else{  
+                    vm.$swal.fire({
+                            icon: 'error',
+                            title: '發生錯誤',
+                            text: res,
+                        })
 
-            //     }
-            // })
+                }
+            })
           
         }
     }

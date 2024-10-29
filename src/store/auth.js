@@ -9,6 +9,8 @@ export default {
         userType:null,
         userId:null,
         isInvalidToken:null,
+        userEmail:null,
+        userPId:null,
     },
     getters:{
         token(state){
@@ -47,6 +49,9 @@ export default {
         SET_USERDETAILS(state,data){
             state.userType = data.usersDetails_type
             state.userId = data.usersDetails_stuId
+            state.userEmail = data.usersDetails_email
+            state.userPId = data.usersDetails_psId
+
         },
         SET_invalidUserMsg(state,data){
             state.invalidUserMsg = data

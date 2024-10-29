@@ -21,7 +21,7 @@ computed:{
       
     }),
      isTA(){
-       if(this.$store.state.auth.userType == 0){
+       if(this.$store.state.auth.userType == 0 || this.$store.state.auth.userType == -1){
           return false
         } else {
           return true
@@ -81,6 +81,9 @@ data() {
       userData:{
         name:this.$store.state.auth.user,
         stuId:this.$store.state.auth.userId,
+        email:this.$store.state.auth.userEmail,
+        pId:this.$store.state.auth.userPId,
+        type:this.$store.state.auth.userType,
       },
     }
   },
