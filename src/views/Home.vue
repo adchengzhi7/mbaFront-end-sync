@@ -106,7 +106,7 @@ export default {
     })
       vm.notFirstLogin = false;
       vm.signIn(vm.form).then( ()=>{
-        if(vm.userType == 0){
+        if(vm.userType == 0 ||vm.userType === -1 ){
            vm.$router.replace({
             name:'StudentDash'
         })
