@@ -36,6 +36,18 @@ data() {
         title:"匯入名單",
         icon:"fas fa-file-import",
         router:"readCsv"
+      },
+       {
+        id:"S04",
+        title:"匯出名單",
+        icon:"fas fa-file-export",
+        router:"readCsv"
+      },
+       {
+        id:"S05",
+        title:"操作LOG",
+        icon:"fas fa-clipboard-list",
+        router:"readCsv"
       }
       ],
       
