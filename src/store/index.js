@@ -50,9 +50,8 @@ export default createStore({
             commit("SET_WINDOWWIDTH",width)
         },
         avatarImg({commit},data){
-            let sex ="initials"
-            let random =data.id.substr(data.id.length - 2);
-            let api = "https://avatars.dicebear.com/v2/"+ sex +"/"+ random+".svg?background=%23d3d3d3";
+            let lastTwoChars = data.id.slice(-2);
+            let api = " https://api.dicebear.com/9.x/initials/svg?seed="+lastTwoChars;
             if(data.type == "loginUser"){
                 commit("SET_AVATAR",api)
             }else{
