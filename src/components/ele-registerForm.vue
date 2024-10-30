@@ -177,12 +177,14 @@
               </div>
             </div>
 
-            <!-- 表單 7 英語檢定 -->
+            <!-- 表單 7 中英語檢定 -->
             <div v-if="pointType.type == 7" class="text-start">
               <div class="row m-0">
                 <div class="text-muted mb-3 h6 text-start">
                   學號： {{currentRegPointUser}}
                 </div>
+                
+                <!-- 語言檢定類別選擇 -->
                 <div class="col input-col">
                   <select 
                     class="form-control" 
@@ -190,22 +192,56 @@
                     @blur="englishSelectedBlured = true"
                     :class="{'is-invalid': isEnglishSelectedNull && englishSelectedBlured, 'is-valid': !isEnglishSelectedNull && englishSelectedBlured }">
                   >
-                    <option value="none" disabled>選擇英語檢定類別</option>
+                    <option value="none" disabled>選擇語言檢定類別</option>
                     <option :key="'test-'+test" v-for="test in englishTest" :value="test"> {{test}} </option>
+                    <option value="other">其他</option> <!-- 新增"其他"選項 -->
                   </select>
                 </div>
               </div>
+
+              <!-- 當選擇"其他"時顯示輸入框 -->
+              <div v-if="englishSelected === 'other'" class="row m-0">
+                <div class="col input-col">
+                  <input 
+                    class="form-control" 
+                    type="text" 
+                    v-model="otherTest" 
+                    @blur="otherTestBlured = true"  
+                    :class="{'is-invalid': isOtherTestNull && otherTestBlured, 'is-valid': !isOtherTestNull && otherTestBlured }"
+                    placeholder="請輸入其他語言檢定類別">
+                    <div class="invalid-feedback">請輸入語言檢定類別</div>
+                </div>
+              </div>
+
+               <!-- 輸入檢定分數或文字 -->
               <div class="row m-0">
                 <div class="col input-col">
                   <input 
-                  class="form-control"
-                  type="number" 
-                  v-model="englishPoint" 
-                  @blur="englishPointBlured = true"
-                  :class="{'is-invalid': isEnglishPointNull && englishPointBlured, 'is-valid': !isEnglishPointNull && englishPointBlured }"
-                  placeholder="輸入英語檢定分數">
-                  <div class="invalid-feedback">請輸入英語檢定分數</div>
+                    class="form-control"
+                    :type="englishSelected === 'other' ? 'text' : 'number'"  
+                    v-model="englishPoint" 
+                    @blur="englishPointBlured = true"
+                    :class="{'is-invalid': isEnglishPointNull && englishPointBlured, 'is-valid': !isEnglishPointNull && englishPointBlured }"
+                    placeholder="請輸入中/英語檢定 分數 或 級別">
+                  <div class="invalid-feedback">請輸入中/英語檢定 分數 或 級別</div>
                 </div>
+              </div>
+
+              <!-- 檢定日期選擇器 -->
+              <div class="row m-0">
+                <div class="col input-col">
+                  <input 
+                    class="form-control" 
+                    type="date" 
+                    v-model="testDate"
+                    @blur="testDateBlured = true"
+                    :class="{'is-invalid': isTestDateNull && testDateBlured, 'is-valid': !isTestDateNull && testDateBlured }">
+                  <div class="invalid-feedback">請選擇檢定日期</div>
+                </div>
+              </div>
+
+              <!-- 提交按鈕 -->
+              <div class="row m-0">
                 <div class="mt-3" :class="{'d-grid gap-2':isDisplaySmall}">
                   <button v-if="!isEdit" class="btn btn-success btn-lg" @click="submitEnglish">提交申請</button>
                   <button v-else class="btn btn-success btn-lg" @click="submitEnglish">保存變更</button>
@@ -241,6 +277,10 @@ export default {
         hoursBlured: false,
         englishPoint:"",
         englishSelected:"none",
+        otherTest: "",  // 新增"其他"選項的輸入值
+        otherTestBlured: false,
+        testDate: "",   // 新增檢定日期
+        testDateBlured: false, 
         englishTest:["TOEFL PBT","TOEFL CBT","TOEFL IBT","IELTS","TOEIC"],
         englishPointBlured:false,
         englishSelectedBlured:false,
@@ -317,6 +357,15 @@ export default {
       if(vm.englishPoint == "none" || vm.englishPoint == null || vm.englishPoint == 0 ){ return true}
       else{return false}
     },
+    isTestDateNull(){
+      let vm = this;
+      if(vm.testDate == "none" || vm.testDate == null || vm.testDate == 0 ){ return true}
+      else{return false}
+    },
+    isOtherTestNull() {
+    let vm = this;
+    return vm.otherTest === '' || vm.otherTest === null;
+  },
     isEnglishSelectedNull(){
       let vm = this;
       if(vm.englishSelected == "none" || vm.englishSelected == null || vm.englishSelected == ""){ return true}
@@ -398,16 +447,15 @@ export default {
        }
        
      },
-     validateEnglish(){
-       let vm =this;
-       vm.englishPointBlured =true;
-       vm.englishSelectedBlured =true;
-         if(vm.checkInputStatus(vm.englishPoint) && vm.checkInputStatus(vm.englishSelected)  ){
-         vm.valid = true
-       }
-       
-     },
-     //這裡繼續，還沒寫完
+     validateEnglish() {
+      let vm = this;
+      vm.englishPointBlured = true;
+      vm.englishSelectedBlured = true;
+      vm.testDateBlured = true;
+      if (vm.checkInputStatus(vm.englishPoint) && vm.checkInputStatus(vm.englishSelected) && vm.checkInputStatus(vm.testDate)) {
+        vm.valid = true;
+      }
+    },
      validateScholarships(){
        let vm =this;
        vm.hoursBlured =true;
@@ -477,54 +525,56 @@ export default {
 
     },
 
-    submitEnglish(){
-      let vm =this;
+    submitEnglish() {
+      let vm = this;
       let insertDate = vm.currentTime();
+      
+      // 確保當選擇 "其他" 時，將 otherTest 寫入 sectionTitle，否則使用選擇的測驗類型
+      const sectionTitle = vm.englishSelected === "other" ? vm.otherTest : vm.englishSelected;
+
       const pointList = {
-        sectionTitle:vm.englishSelected,
-        yearSelected : 0,
-        points : 0,
-        semesterSelected : 0,
-        type :vm.pointType.type,
-        status : vm.status,
-        stuId : vm.currentRegPointUser,
-        englishCredit: vm.englishPoint,
-        insertDate:insertDate,
+        sectionTitle: sectionTitle,  // 使用選擇的檢定類別或 "其他" 的輸入
+        yearSelected: 0,
+        points: 0,
+        semesterSelected: 0,
+        type: vm.pointType.type,
+        status: vm.status,
+        stuId: vm.currentRegPointUser,
+        englishCredit: vm.englishPoint,  // 無論是數字還是文字都寫入這裡
+        insertDate: insertDate,
+        testDate: vm.testDate  // 傳遞檢定日期
+      };
 
-      }
-     
-       vm.validateEnglish();
-       if(vm.valid && !vm.isEdit){
-        vm.insertUserPoint(pointList).then((res)=>{
-          if(res.data.success == 1){
-            if(!vm.isTA){
-              vm.showAlert("StudentDash",vm.studentDoneMessage,null)
-            }else {
-              vm.showAlert("TaStudentPage",vm.taDoneMessage,vm.currentRegPointUser)
-            }
-          }else{
-            //show error modal
+      // 執行表單驗證
+      vm.validateEnglish();
+      console.log(pointList)
+      if (vm.valid && !vm.isEdit) {
+        vm.insertUserPoint(pointList).then((res) => {
+          if (res.data.success == 1) {
+            const message = vm.isTA ? vm.taDoneMessage : vm.studentDoneMessage;
+            const route = vm.isTA ? "TaStudentPage" : "StudentDash";
+            vm.showAlert(route, message, vm.currentRegPointUser);
+          } else {
+            // 顯示錯誤提示
+            alert("提交失敗，請再試一次");
           }
-        })
+        });
       }
-       if(vm.valid && vm.isEdit){
+
+      if (vm.valid && vm.isEdit) {
         pointList.pointsId = vm.pointData.pointId;
-        vm.updatePointByPointId(pointList).then((res)=>{
-          console.log(res);
-          if(res.data.success == 1){
-            if(!vm.isTA){
-              vm.showAlert("StudentDash",vm.editMessage,null)
-            }else {
-              vm.showAlert("TaStudentPage",vm.taDoneMessage,vm.currentRegPointUser)
-
-            }
-          }else{
-            alert("unvalid")
+        vm.updatePointByPointId(pointList).then((res) => {
+          if (res.data.success == 1) {
+            const message = vm.isTA ? vm.taDoneMessage : vm.editMessage;
+            const route = vm.isTA ? "TaStudentPage" : "StudentDash";
+            vm.showAlert(route, message, vm.currentRegPointUser);
+          } else {
+            alert("更新失敗，請再試一次");
           }
-        })
+        });
       }
     },
-    //還沒有寫後端
+    
     submitScholarships() {
       let vm =this;
       let insertDate = vm.currentTime();
@@ -707,4 +757,4 @@ option:first-of-type {
   }
 }
 
-</style>>
+</style>

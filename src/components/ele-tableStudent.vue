@@ -1,7 +1,6 @@
 <template>
     <div>
         <customTable>
-           
             <template #thead>
                 <tr v-if="isSub" >
                     <th  class="" :key="th.key" v-for="th in theadSub" @click ="sortSelector(th.id,th.isSort)" :class="{'text-center':isDisplaySmall==true}"   scope="col">
@@ -41,7 +40,9 @@
                             <div class="font-weight-bold"> {{item.section}}</div>
                             <div class="text-muted">
                                 <span>{{item.section_title}}</span>
-                                <span v-if ="item.englishCredit!= null" > -{{item.englishCredit}}分</span>
+                                <span v-if ="item.englishCredit!= null" > 
+                                    - {{ isNaN(item.englishCredit) ? item.englishCredit : item.englishCredit + '分' }} / {{  formatDate(item.englishCreditDate)}}
+                                </span>
                             </div>
                         </div>
 
@@ -86,10 +87,10 @@
                     </td>
                 </tr>
                 <tr class="bg-shadow-hover rounded text-center pointer">
-                    <td v-if="!isTA" style=" padding: 0.6rem !important;" :colspan="thead.length+1" @click="routerTo('StudentReg',stuId)">
+                    <td v-if="!isTA" style=" padding: 0.6rem !important;" :colspan="isSub ? theadSub.length + 1 : thead.length + 1"  @click="routerTo('StudentReg',stuId)">
                          <router-link to="/"><i class="fas fa-plus"></i> 登錄點數</router-link>
                     </td>
-                    <td v-else style=" padding: 0.6rem !important;" :colspan="thead.length+1" @click="routerTo('TaReg',stuId)">
+                    <td v-else style=" padding: 0.6rem !important;" :colspan="isSub ? theadSub.length + 1 : thead.length + 1"  @click="routerTo('TaReg',stuId)">
                          <router-link to="/"><i class="fas fa-plus"></i> 登錄點數</router-link>
                     </td>
 
@@ -104,13 +105,14 @@ import customTable from "./tmp-table";
 import { mapGetters,mapActions} from 'vuex'
 
 export default {
-    props:["isTA","isSub","stuId"],
+    props:["isTA","stuId"],
     components:{
         customTable
     },
     mounted() {
     },
     methods: {
+        
         ...mapActions({
             regStudentIs:'regStudentIs',
             approvePointId:'userPoint/approvePointId',
@@ -119,83 +121,83 @@ export default {
             
         }),
       
-      async showAlert(object) {
-        let vm =this;
-        
-        await vm.$swal({
-            title: '<h2 class="font-weight-boldest m-0">您確定要審核通過？</h2>',
-            showCloseButton: true,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#009F40',
-            cancelButtonColor: '#A0A9BA',
-            confirmButtonText: '確定',
-            cancelButtonText: '取消',
-         })
-         .then((result) => {
-            if (result.isConfirmed) {
-                vm.approvePointId(object).then(()=>{
-                    vm.successAlert("審核通過!")
-                }).catch((e)=>{
-                    console.log(e);
-                })
-                
-            }
-        })
-      },
-      async warningAlert(object){
-          let vm = this;
-          await vm.$swal({
-            title: '<h2 class="font-weight-boldest m-0">您確定要刪除？</h2>',
-            showCloseButton: true,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#DB3058',
-            cancelButtonColor: '#A0A9BA',
-            confirmButtonText: '刪除',
-            cancelButtonText: '取消',
-         }) .then((result) => {
-            if (result.isConfirmed) {
-                  vm.deletePointId(object).then(()=>{
-                    vm.successAlert("已刪除！!")
-                }).catch((e)=>{
-                    console.log(e);
-                })
-            }
-        })
-      },
-      successAlert(msg){
-          let vm =this;
-          vm.$swal({
-                title: '<h2 class="font-weight-boldest success m-0">'+msg+'</h2>',
-                icon: 'success',
-                showCancelButton: false,
-                showConfirmButton:false,
-                timer:2000
-                })
-                // .then(()=>{
-                //     vm.$router.go(routeName)
-                // })
+        async showAlert(object) {
+            let vm =this;
+            
+            await vm.$swal({
+                title: '<h2 class="font-weight-boldest m-0">您確定要審核通過？</h2>',
+                showCloseButton: true,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#009F40',
+                cancelButtonColor: '#A0A9BA',
+                confirmButtonText: '確定',
+                cancelButtonText: '取消',
+            })
+            .then((result) => {
+                if (result.isConfirmed) {
+                    vm.approvePointId(object).then(()=>{
+                        vm.successAlert("審核通過!")
+                    }).catch((e)=>{
+                        console.log(e);
+                    })
+                    
+                }
+            })
+        },
+        async warningAlert(object){
+            let vm = this;
+            await vm.$swal({
+                title: '<h2 class="font-weight-boldest m-0">您確定要刪除？</h2>',
+                showCloseButton: true,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#DB3058',
+                cancelButtonColor: '#A0A9BA',
+                confirmButtonText: '刪除',
+                cancelButtonText: '取消',
+            }) .then((result) => {
+                if (result.isConfirmed) {
+                    vm.deletePointId(object).then(()=>{
+                        vm.successAlert("已刪除！!")
+                    }).catch((e)=>{
+                        console.log(e);
+                    })
+                }
+            })
+        },
+        successAlert(msg){
+            let vm =this;
+            vm.$swal({
+                    title: '<h2 class="font-weight-boldest success m-0">'+msg+'</h2>',
+                    icon: 'success',
+                    showCancelButton: false,
+                    showConfirmButton:false,
+                    timer:2000
+                    })
+                    // .then(()=>{
+                    //     vm.$router.go(routeName)
+                    // })
 
-      },
-      routerTo(path,id){
-          let vm = this;
-          vm.regStudentIs(id);
-          vm.$router.push({name:path})
+        },
+        routerTo(path,id){
+              let vm = this;
+            vm.regStudentIs(id);
+            vm.$router.push({name:path})
         },
         routerToWithParam(id,param){
-          let path = null;
-          let vm = this;
-          vm.regStudentIs(id);
-          if(!vm.isTA){
-              path="StudentRegFormEdit";
-              vm.$router.push({name:path,query: { pointsId:param }})
-          }else{
-              path="TaRegFormEdit";
-              vm.$router.push({name:path,query: { pointsId:param }})
-          }
+            let path = null;
+            let vm = this;
+            vm.regStudentIs(id);
+            if(!vm.isTA){
+                path="StudentRegFormEdit";
+                vm.$router.push({name:path,query: { pointsId:param }})
+            }else{
+                path="TaRegFormEdit";
+                vm.$router.push({name:path,query: { pointsId:param }})
+            }
         },
-          sortSelector(selected,isSort){
+        sortSelector(selected,isSort){
             let vm = this;
             if(isSort){
                 vm.sortBy = selected;
@@ -211,7 +213,12 @@ export default {
                 return year + "/"+smester
             }
             return "-"
-         }
+        },
+        formatDate(dateString) {
+            if (!dateString) return ''; // 如果日期不存在則返回空字串
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-CA'); // 使用 ISO 8601 格式，即 YYYY-MM-DD
+        },
     },
     computed:{
         ...mapGetters({
@@ -242,6 +249,15 @@ export default {
         } else {
             return true;
         }
+    },
+    isSub() {
+      let vm = this;
+      // 確認 studentData 存在並檢查 type 是否為 -1
+      if (vm.$store.state.student.studentData && vm.$store.state.student.studentData.type == -1) {
+        return true;
+      } else {
+        return false;
+      }
     }
 
     },

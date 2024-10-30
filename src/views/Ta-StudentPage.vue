@@ -66,7 +66,7 @@ export default {
      isSub() {
       let vm = this;
       // 確認 studentData 存在並檢查 type 是否為 -1
-      if (vm.$store.state.student.studentData && vm.$store.state.student.studentData.type === -1) {
+      if (vm.$store.state.student.studentData && vm.$store.state.student.studentData.type == -1) {
         return true;
       } else {
         return false;
