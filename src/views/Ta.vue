@@ -41,13 +41,13 @@ data() {
         id:"S04",
         title:"匯出名單",
         icon:"fas fa-file-export",
-        router:"readCsv"
+        router:"exportCsv"
       },
        {
         id:"S05",
         title:"操作LOG",
         icon:"fas fa-clipboard-list",
-        router:"readCsv"
+        router:"userLog"
       }
       ],
       

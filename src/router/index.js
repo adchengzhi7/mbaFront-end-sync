@@ -9,6 +9,8 @@ import TaStudentPage from '../views/Ta-StudentPage.vue'
 import TaRegForm from '../views/Ta-Reg-Form.vue'
 import TaRegFormEdit from '../views/Ta-Reg-EditForm.vue'
 import readCsv from '../views/Ta-ImportUser.vue'
+import exportCsv from '../views/Ta-ExportUserList.vue'
+import userLog from '../views/Ta-LogList.vue'
 import StudentReg from '../views/Student-Reg.vue'
 import StudentRegForm from '../views/Student-Reg-Form.vue'
 import StudentRegFormEdit from '../views/Student-Reg-EditForm.vue'
@@ -76,7 +78,20 @@ const routes = [
       path:"readCsv",
       name:"readCsv",
       component:readCsv
+    },
+    {
+      path:"exportCsv",
+      name:"exportCsv",
+      component:exportCsv
+    },
+    {
+      path:"userLog",
+      name:"userLog",
+      component:userLog
     }
+    
+
+    
   ]
 
 

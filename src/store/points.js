@@ -8,6 +8,7 @@ import auth from './auth'
         pointById:null,
         updateSts:false,
         approveSts:false,
+        exportData: [], // 新增 exportData 來存儲回應資料
     },
     getters:{
         userPoints(state){
@@ -19,6 +20,9 @@ import auth from './auth'
         },
         pointById(state){
             return state.pointById
+        },
+        exportData(state) { // 新增 exportData getter
+            return state.exportData;
         },
     },
     mutations:{
@@ -38,7 +42,10 @@ import auth from './auth'
         },
         SET_APPROVESTS(state,data){
             state.approveSts = data;
-        }
+        },
+        SET_EXPORTDATA(state, data) { // 新增 SET_EXPORTDATA mutation
+            state.exportData = data;
+        },
         
         
         
@@ -149,6 +156,17 @@ import auth from './auth'
                 dispatch('getUnreviewPoint')
                 return response;
         },
+        async fetchExportData({ commit }, exportList) {
+            try {
+              const response = await axios.post('/points/export', exportList, {
+                headers: { Authorization: 'Bearer ' + auth.state.token },
+              });
+              commit('SET_EXPORTDATA', response.data); // 假設資料成功儲存
+            } catch (error) {
+              console.error('Error fetching export data:', error);
+              throw error;
+            }
+        }
         
     },
     modules:{
