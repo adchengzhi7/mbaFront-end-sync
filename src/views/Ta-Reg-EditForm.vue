@@ -21,10 +21,10 @@ export default {
         sycnDataToComp(){
         let vm = this;
         if(vm.pointById){
+          console.log(vm.$store.state.userPoint.pointById);
         vm.pointType.title =vm.$store.state.userPoint.pointById.section;
         vm.pointType.icon = vm.$store.state.userPoint.pointById.icon;
         vm.pointType.type= vm.$store.state.userPoint.pointById.type;
-
         vm.pointData.sectionTitle= vm.$store.state.userPoint.pointById.sectionTitle;
         vm.pointData.yearSelected= vm.$store.state.userPoint.pointById.yearSelected;
         vm.pointData.points= vm.$store.state.userPoint.pointById.point;
@@ -34,6 +34,8 @@ export default {
         vm.pointData.stuId= vm.$store.state.userPoint.pointById.stuId;
         vm.pointData.englishCredit= vm.$store.state.userPoint.pointById.englishCredit;
         vm.pointData.pointId= vm.$store.state.userPoint.pointById.pointId;
+        vm.pointData.testDate= vm.$store.state.userPoint.pointById.englishCreditDate;
+        vm.pointData.scholarshipHours= vm.$store.state.userPoint.pointById.scholarshipHours;
         return true
       }
         return false

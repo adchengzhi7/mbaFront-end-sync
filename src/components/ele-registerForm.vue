@@ -307,24 +307,39 @@ export default {
             return true;
         }
     },
-     editDataByUser(){
-        let vm=this;
-        if(vm.pointData){
-          vm.isEdit = true;
-          vm.sectionTitle= vm.pointData.sectionTitle;
-          vm.englishSelected= vm.pointData.sectionTitle;
-          vm.yearSelected= vm.pointData.yearSelected;
-          vm.points= vm.pointData.points;
-          vm.semesterSelected= vm.pointData.semesterSelected;
-          vm.type= vm.pointData.type;
-          vm.status= vm.pointData.status;
-          vm.stuId= vm.pointData.stuId;
-          vm.englishPoint= vm.pointData.englishCredit;
-          return true
-        }
-        return false
-        
-      },
+    editDataByUser() {
+    let vm = this;
+    if (vm.pointData) {
+      vm.isEdit = true;
+
+      // Populate existing data
+      vm.sectionTitle = vm.pointData.sectionTitle;
+      vm.yearSelected = vm.pointData.yearSelected;
+      vm.points = vm.pointData.points;
+      vm.semesterSelected = vm.pointData.semesterSelected;
+      vm.type = vm.pointData.type;
+      vm.status = vm.pointData.status;
+      vm.stuId = vm.pointData.stuId;
+      vm.englishPoint = vm.pointData.englishCredit;
+
+      // Format `testDate` to `YYYY-MM-DD`
+      if (vm.pointData.testDate) {
+        const date = new Date(vm.pointData.testDate);
+        vm.testDate = date.toISOString().slice(0, 10);
+      }
+
+      // Set `englishSelected` to "other" if not in `englishTest`
+      vm.englishSelected = vm.pointData.sectionTitle;
+      if (!vm.englishTest.includes(vm.englishSelected)) {
+        vm.englishSelected = "other";
+      }
+
+      vm.otherTest = vm.pointData.sectionTitle;
+
+      return true;
+    }
+    return false;
+  },
     isSectionNull(){
       let vm = this;
       if(vm.sectionTitle == "" || vm.sectionTitle == null ){ return true}
