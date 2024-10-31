@@ -1,5 +1,7 @@
 import axios from 'axios'   
 import auth from './auth'
+import log from './log'; // 引入 log 模塊
+
  const student = {
     namespaced:true,
     state:{
@@ -106,13 +108,45 @@ import auth from './auth'
             dispatch("setProgressNull");
 
         },
-        async updateStudent({dispatch}, data) {
-            let response = await axios.patch('/users/', data, { 
-              headers: { 'Authorization': 'Bearer ' + auth.state.token },
-            });
-            
-            await dispatch("getStudentDataById", data.studentid);  // 確保資料更新後重新加載
-            return response.status;
+        async updateStudent({ dispatch }, data) {
+            try {
+        
+                // 1. 取得原始學生資料
+                const originalDataResponse = await axios.get(`/users/${data.studentid}`, {
+                    headers: { 'Authorization': 'Bearer ' + auth.state.token }
+                });
+                const originalData = originalDataResponse.data?.data || null; 
+        
+                // 2. 執行更新操作
+                let response = await axios.patch('/users/', data, { 
+                    headers: { 'Authorization': 'Bearer ' + auth.state.token },
+                });
+        
+                // 3. 確保資料更新後重新加載
+                await dispatch("getStudentDataById", data.studentid);
+        
+                // 4. 獲取客戶端 IP
+                const clientIp = await dispatch('auth/getClientIp', null, { root: true });
+        
+                // 5. 構建 LOG 資料
+                const logData = {
+                    logType: 'edit_student',
+                    userId: auth.state.userId,
+                    studentId: data.studentid,
+                    ipAddress: clientIp,
+                    deviceInfo: navigator.userAgent,
+                    previousData: originalData, // 修改前的資料
+                    updatedData: data           // 修改後的資料
+                };
+        
+                // 6. 傳送 LOG
+                await log.createLog(logData, auth.state.token);
+        
+                return response.status;
+            } catch (error) {
+                console.error("更新學生資料時出錯:", error.response || error.message);
+                throw error; // 繼續拋出錯誤供其他部分處理
+            }
         },
         setNewStudentNull({commit,dispatch}){
             commit('SET_NEWSTUDENTLIST',null)

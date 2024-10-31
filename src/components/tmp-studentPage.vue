@@ -236,7 +236,7 @@ export default {
         
         if (formValues) {
             vm.updateStudent(formValues).then((res)=>{
-              console.log(res)
+              // console.log(res)
                 if(res == 200){
                     vm.$swal.fire({
                         icon: 'success',

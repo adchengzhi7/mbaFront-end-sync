@@ -95,22 +95,34 @@ export default {
         errorMsg({commit},data){
             return  commit('SET_invalidUserMsg',data.message)
         },
-        async attempt({commit,state},token){
-            if(token){
-                commit('SET_TOKEN',token)
+        async attempt({ commit, state }, token) {
+            // 若 token 為空，從 localStorage 嘗試加載
+            if (!token) {
+                token = localStorage.getItem('token');
+                if (!token) return; // 若 localStorage 中也無 token，直接返回
             }
-            if(!state.token){
-                return
-
+        
+            // 若有 token，設置 Vuex state
+            commit('SET_TOKEN', token);
+        
+            // 檢查是否成功設置 token
+            if (!state.token) {
+                return;
             }
+        
             try {
+                // 解碼 token 並更新用戶信息
                 let decoded = jwt_decode(token);
-                commit('SET_USER',decoded.result.usersDetails_cName)
-                commit('SET_USERDETAILS',decoded.result)
-
+                commit('SET_USER', decoded.result.usersDetails_cName);
+                commit('SET_USERDETAILS', decoded.result);
+        
+                // 將 token 存入 localStorage 以持久化
+                localStorage.setItem('token', token);
             } catch (e) {
-                commit('SET_TOKEN',null)
-                commit('SET_USER',null)
+                // 若解碼出錯，清空 token 和 user 信息
+                commit('SET_TOKEN', null);
+                commit('SET_USER', null);
+                localStorage.removeItem('token'); // 移除 localStorage 中的 token
             }
         },
         signOut({commit}){
@@ -130,7 +142,16 @@ export default {
                 commit('SET_ISINVALIDTOKEN', true);
                 console.log(error);
             });
-        }
+        },
+        async getClientIp() {
+            try {
+                const response = await axios.get('https://api.ipify.org?format=json');
+                return response.data.ip;
+            } catch (error) {
+                console.error('無法取得客戶端 IP:', error);
+                return '未知 IP';
+            }
+        },
         
     },
     modules:{
