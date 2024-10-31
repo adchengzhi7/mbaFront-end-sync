@@ -131,8 +131,8 @@ export default {
       const date = new Date();
       const year = date.getFullYear();
       const mingYear = year - 1911;
-      const yearStart = mingYear - 5;
-      const yearEnd = mingYear + 5;
+      const yearStart = mingYear - 25;
+      const yearEnd = mingYear + 25;
       const yearList = [];
       for (let i = yearStart; i < yearEnd; i++) {
         yearList.push(i);
