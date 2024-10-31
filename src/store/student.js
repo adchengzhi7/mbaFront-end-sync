@@ -1,6 +1,5 @@
 import axios from 'axios'   
 import auth from './auth'
-import log from './log'; // 引入 log 模塊
 
  const student = {
     namespaced:true,
@@ -108,6 +107,12 @@ import log from './log'; // 引入 log 模塊
             dispatch("setProgressNull");
 
         },
+
+        setNewStudentNull({commit,dispatch}){
+            commit('SET_NEWSTUDENTLIST',null)
+            dispatch("setProgressNull");
+        },
+        
         async updateStudent({ dispatch }, data) {
             try {
         
@@ -140,7 +145,8 @@ import log from './log'; // 引入 log 模塊
                 };
         
                 // 6. 傳送 LOG
-                await log.createLog(logData, auth.state.token);
+                await dispatch('log/createLog', { logData, token: auth.state.token }, { root: true });
+
         
                 return response.status;
             } catch (error) {
@@ -148,28 +154,61 @@ import log from './log'; // 引入 log 模塊
                 throw error; // 繼續拋出錯誤供其他部分處理
             }
         },
-        setNewStudentNull({commit,dispatch}){
-            commit('SET_NEWSTUDENTLIST',null)
-            dispatch("setProgressNull");
-        },
-        async insertStudentasList({dispatch},data){
-            dispatch("progressBarPrecent")
-            dispatch("isInsertingStudent",true)
-            await axios.post('/users/',data,{ 
-                headers:{'Authorization':'Bearer ' +auth.state.token },
-             },)
-             .then(function (response) {
-                 dispatch("newStudent",response.data)
-                 return response.status;
-              })
-              .catch(function (error) {
-                   throw error;
-              })    
-              .finally( function(){
-                dispatch("isInsertingStudent",false);
+        async insertStudentasList({ dispatch, commit }, studentsList) {
+            dispatch("progressBarPrecent");
+            dispatch("isInsertingStudent", true);
+        
+            try {
+                // 將整個學生列表發送到後端進行批量處理
+                const response = await axios.post('/users/', studentsList, {
+                    headers: { 'Authorization': 'Bearer ' + auth.state.token },
+                });
+        
+                // 確認所有成功新增的學生資料後進行 log 記錄
+                if (response.data) {
+                    const updatedStudentList = [];
+        
+                    for (const studentResponse of response.data) {
+                        // 只記錄成功新增的學生
+                        if (studentResponse.success === 1) {
+                            // 獲取客戶端 IP
+                            const clientIp = await dispatch('auth/getClientIp', null, { root: true });
+        
+                            // 構建 LOG 資料
+                            const logData = {
+                                logType: 'add_student',
+                                userId: auth.state.userId,
+                                studentId: studentResponse.studentid,
+                                ipAddress: clientIp,
+                                deviceInfo: navigator.userAgent,
+                                addedData: studentResponse
+                            };
+        
+                            // 傳送 LOG
+                            await dispatch('log/createLog', { logData, token: auth.state.token }, { root: true });
 
-              });
-              
+
+                            console.log("成功新增的學生資料已記錄日誌。");
+                        } else if (studentResponse.success === 0) {
+                            console.error(studentResponse.stsMsg);
+                        }
+        
+                        // 將當前學生資料推入更新列表
+                        updatedStudentList.push(studentResponse);
+                    }
+        
+                    // 更新前端顯示列表
+                    commit("SET_NEWSTUDENTLIST", updatedStudentList);
+                } else {
+                    console.warn("未找到有效的新增結果，請檢查 API 回應結構");
+                }
+        
+            } catch (error) {
+                console.error("批量新增學生資料時出錯:", error.message || error);
+                throw error;
+            } finally {
+                dispatch("isInsertingStudent", false);
+            }
         },
        
         isInsertingStudent({commit},data){

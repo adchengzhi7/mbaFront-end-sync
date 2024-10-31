@@ -1,6 +1,5 @@
 import axios from 'axios'
 import auth from './auth'
-import log from './log'  
  const points = {
     namespaced:true,
     state:{
@@ -112,7 +111,8 @@ import log from './log'
             };
         
             try {
-                await log.createLog(logData, auth.state.token); // 傳送日誌
+                await dispatch('log/createLog', { logData, token: auth.state.token }, { root: true });
+
             } catch (error) {
                 console.error('記錄日誌時出錯:', error);
             }
@@ -194,7 +194,8 @@ import log from './log'
                 };
         
                 // 傳送日誌
-                await log.createLog(logData, auth.state.token);
+                await dispatch('log/createLog', { logData, token: auth.state.token }, { root: true });
+
         
                 // 更新狀態
                 dispatch('updateStsCommit', true);
@@ -232,7 +233,7 @@ import log from './log'
                 };
         
                 // 5. 傳送日誌
-                await log.createLog(logData, auth.state.token);
+                await dispatch('log/createLog', { logData, token: auth.state.token }, { root: true });
         
                 // 更新狀態
                 dispatch('getUserPoint', data.stuId);
@@ -271,7 +272,7 @@ import log from './log'
                 };
         
                 // 5. 傳送日誌
-                await log.createLog(logData, auth.state.token);
+                await dispatch('log/createLog', { logData, token: auth.state.token }, { root: true });
         
                 // 更新狀態
                 dispatch('getUserPoint', data.stuId);

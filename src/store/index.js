@@ -2,6 +2,7 @@ import {createStore } from 'vuex'
 import auth from './auth'
 import points from './points'
 import student from './student'
+import log from './log';
 
 export default createStore({
     state:{
@@ -64,5 +65,6 @@ export default createStore({
         userPoint:points,
         auth:auth,
         student:student,
+        log:log
     }
 })

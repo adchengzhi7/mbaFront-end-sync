@@ -242,20 +242,37 @@ methods: {
         )
         
     },
-    async insertAdmin(adminList){
-        try{
-           let result = await axios.post('/users/',adminList,
-                { 
-                headers:{'Authorization':'Bearer ' +this.token },
-                },)
-        return result;
-        }catch(e){
-            console.log(e);
+    async insertAdmin(adminData) {
+        try {
+            // 插入助教帳戶
+            let result = await axios.post('/users/', adminData, {
+                headers: { 'Authorization': 'Bearer ' + this.token },
+            });
+
+            // 檢查插入是否成功
+            if (result.data.affectedRows === 1) {
+                // 插入成功，記錄 log
+                const clientIp = await this.$store.dispatch('auth/getClientIp'); // 获取客户端 IP
+
+                const logData = {
+                    logType: 'add_admin',
+                    userId: this.$store.state.auth.userId,  // 当前用户的 ID
+                    studentId: adminData.studentid,          // 新增的助教的 studentId
+                    ipAddress: clientIp,
+                    deviceInfo: navigator.userAgent,
+                    addedData: adminData                    // 新增的助教资料
+                };
+
+                // 发送 log 请求
+                await this.$store.dispatch('log/createLog', { logData, token: this.token });
+                console.log("新增助教的操作已記錄日誌。");
+            }
+
+            return result;
+
+        } catch (error) {
+            console.error("新增助教时出错:", error);
         }
-       
-        
-       
-        
     },
 
     handleFileDrop(e) {

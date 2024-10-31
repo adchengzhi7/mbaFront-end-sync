@@ -1,6 +1,7 @@
 import axios from 'axios'
 import jwt_decode from "jwt-decode";
-import log from './log'; // 新增這行以引用 logAPI
+import auth from './auth'
+
 
 export default {
     namespaced:true,
@@ -63,7 +64,7 @@ export default {
         }
     },
     actions:{
-        async signIn({ dispatch, state }, credentials) {
+        async signIn({ dispatch,  }, credentials) {
             let response = await axios.post('/users/login', credentials);
             dispatch('errorMsg', response.data);
             await dispatch('attempt', response.data.token);
@@ -87,7 +88,8 @@ export default {
             };
 
             try {
-                await log.createLog(logData, state.token); // 傳入 token
+                await dispatch('log/createLog', { logData, token: auth.state.token }, { root: true });
+
             } catch (error) {
                 console.error('記錄日誌時出錯:', error);
             }
