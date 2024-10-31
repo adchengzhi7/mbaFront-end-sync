@@ -1,5 +1,7 @@
 import axios from 'axios'
 import jwt_decode from "jwt-decode";
+import log from './log'; // 新增這行以引用 logAPI
+
 export default {
     namespaced:true,
     state:{
@@ -61,11 +63,26 @@ export default {
         }
     },
     actions:{
-        async signIn ({dispatch},credentials){
-            let response = await axios.post('/users/login',credentials)
-            dispatch('errorMsg',response.data)
-            return dispatch('attempt', response.data.token)
-        },
+        async signIn({ dispatch, state }, credentials) {
+            let response = await axios.post('/users/login', credentials);
+            dispatch('errorMsg', response.data);
+            await dispatch('attempt', response.data.token);
+            
+            // 記錄登入日誌
+            const logData = {
+              logType: 'login',
+              userId: credentials.user,
+              ipAddress: null, // 動態獲取 IP, 讓後端處理
+              deviceInfo: navigator.userAgent, // 設備資訊
+            };
+            
+            try {
+              await log.createLog(logData, state.token); // 傳入 token
+            } catch (error) {
+              console.error('記錄日誌時出錯:', error);
+            }
+          },
+        
         errorMsg({commit},data){
             return  commit('SET_invalidUserMsg',data.message)
         },

@@ -5,7 +5,7 @@
 </template>
 
 <script>
-  import registerForm from '../components/ele-registerForm'
+  import registerForm from '../components/ele-registerForm' 
   import { mapGetters } from 'vuex'
 
 export default {
