@@ -102,8 +102,10 @@ import { mapGetters, mapActions } from "vuex";
 export default {
   props: ["isTA"],
   data() {
+    const date = new Date();
+    const currentYear = date.getFullYear() - 1911; // 轉換成民國年
     return {
-      yearSelected: "",
+      yearSelected:  currentYear,
       yearBlured: false,
       statusOption: [],
       selectedExportOptions: [],
