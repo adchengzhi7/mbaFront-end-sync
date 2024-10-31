@@ -3,7 +3,7 @@ import axios from 'axios';
 
 export default {
   createLog(logData, token) {
-    console.log(logData)
+    // console.log(logData)
     return axios.post('/logs', logData, {
       headers: {
         Authorization: `Bearer ${token}`

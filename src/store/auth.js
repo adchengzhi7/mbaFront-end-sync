@@ -122,9 +122,9 @@ export default {
             await axios.get('/users/check', {
                 headers: { 'Authorization': 'Bearer ' + state.token }
             })
-            .then((res) => {
+            .then(() => {
                 commit('SET_ISINVALIDTOKEN', false);
-                console.log(res);
+                // console.log(res);
             })
             .catch((error) => {
                 commit('SET_ISINVALIDTOKEN', true);

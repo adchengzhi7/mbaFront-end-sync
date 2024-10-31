@@ -169,7 +169,7 @@ import log from './log'
                     headers: { 'Authorization': 'Bearer ' + auth.state.token }
                 });
                 const originalData = originalDataResponse?.data?.data?.[0] || null; // 提取數據
-                console.log("原本的資料:", originalData);
+                // console.log("原本的資料:", originalData);
         
                 // 執行更新操作
                 let response = await axios.patch('/points/edit/', data, {
@@ -207,23 +207,80 @@ import log from './log'
         updateStsCommit({commit},data){
            commit('SET_UPDATESTS',data)
         },
-        async approvePointId({dispatch},data){
-            // console.log(data);
-            let response = await axios.patch('/points/approve/',data,{
-                headers:{'Authorization':'Bearer ' +auth.state.token }
-                })
-                dispatch('getUserPoint', data.stuId)
-                dispatch('getUnreviewPoint')
+        async approvePointId({ dispatch }, data) {
+            try {
+               
+                let response = await axios.patch('/points/approve/', data, {
+                    headers: { 'Authorization': 'Bearer ' + auth.state.token }
+                });
+        
+                // 3. 獲取客戶端 IP
+                const clientIp = await dispatch('getClientIp');
+        
+                // 4. 構建日誌資料
+                const logData = {
+                    logType: 'update_point_status',
+                    userId: auth.state.userId,
+                    studentId: data.stuId,
+                    pointsId: data.pointId,
+                    ipAddress: clientIp,
+                    deviceInfo: navigator.userAgent,
+                    previousData: { status: data.status  }, // 原始狀態
+                    updatedData: { status: 2 },     // 更新後的狀態
+                    addedData: null,
+                    exportParams: null
+                };
+        
+                // 5. 傳送日誌
+                await log.createLog(logData, auth.state.token);
+        
+                // 更新狀態
+                dispatch('getUserPoint', data.stuId);
+                dispatch('getUnreviewPoint');
                 return response;
+            } catch (error) {
+                console.error("更新點數狀態時出錯:", error);
+                throw error;
+            }
         },
-        async deletePointId({dispatch},data){
-            // console.log(data);
-            let response = await axios.patch('/points/delete/',data,{
-                headers:{'Authorization':'Bearer ' +auth.state.token }
-                })
-                dispatch('getUserPoint', data.stuId)
-                dispatch('getUnreviewPoint')
+        
+        async deletePointId({ dispatch }, data) {
+            try {
+          
+        
+                // 2. 執行刪除操作
+                let response = await axios.patch('/points/delete/', data, {
+                    headers: { 'Authorization': 'Bearer ' + auth.state.token }
+                });
+        
+                // 3. 獲取客戶端 IP
+                const clientIp = await dispatch('getClientIp');
+        
+                // 4. 構建日誌資料
+                const logData = {
+                    logType: 'update_point_status',
+                    userId: auth.state.userId,
+                    studentId: data.stuId,
+                    pointsId: data.pointId,
+                    ipAddress: clientIp,
+                    deviceInfo: navigator.userAgent,
+                    previousData: { status: data.status }, // 原始狀態
+                    updatedData: { status: '3' },       // 更新後的狀態，標記為已刪除
+                    addedData: null,
+                    exportParams: null
+                };
+        
+                // 5. 傳送日誌
+                await log.createLog(logData, auth.state.token);
+        
+                // 更新狀態
+                dispatch('getUserPoint', data.stuId);
+                dispatch('getUnreviewPoint');
                 return response;
+            } catch (error) {
+                console.error("刪除點數時出錯:", error);
+                throw error;
+            }
         },
         async fetchExportData({ commit }, exportList) {
             try {

@@ -562,7 +562,7 @@ export default {
 
       // 執行表單驗證
       vm.validateEnglish();
-      console.log(pointList)
+      // console.log(pointList)
       if (vm.valid && !vm.isEdit) {
         vm.insertUserPoint(pointList).then((res) => {
           if (res.data.success == 1) {
