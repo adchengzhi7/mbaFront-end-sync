@@ -67,22 +67,31 @@ export default {
             let response = await axios.post('/users/login', credentials);
             dispatch('errorMsg', response.data);
             await dispatch('attempt', response.data.token);
-            
-            // 記錄登入日誌
-            const logData = {
-              logType: 'login',
-              userId: credentials.user,
-              ipAddress: null, // 動態獲取 IP, 讓後端處理
-              deviceInfo: navigator.userAgent, // 設備資訊
-            };
-            
+
+            // 獲取客戶端 IP 地址
+            let clientIp;
             try {
-              await log.createLog(logData, state.token); // 傳入 token
+                const ipResponse = await axios.get('https://api.ipify.org?format=json');
+                clientIp = ipResponse.data.ip;
             } catch (error) {
-              console.error('記錄日誌時出錯:', error);
+                console.error('無法獲取客戶端 IP:', error);
+                clientIp = '未知 IP';
             }
-          },
-        
+
+            // 構建日誌數據並記錄登入日誌
+            const logData = {
+                logType: 'login',
+                userId: credentials.user,
+                ipAddress: clientIp,
+                deviceInfo: navigator.userAgent, // 設備資訊
+            };
+
+            try {
+                await log.createLog(logData, state.token); // 傳入 token
+            } catch (error) {
+                console.error('記錄日誌時出錯:', error);
+            }
+        },
         errorMsg({commit},data){
             return  commit('SET_invalidUserMsg',data.message)
         },
