@@ -283,15 +283,37 @@ import auth from './auth'
                 throw error;
             }
         },
-        async fetchExportData({ commit }, exportList) {
+        async fetchExportData({ commit, dispatch }, exportList) {
             try {
-              const response = await axios.post('/points/export', exportList, {
-                headers: { Authorization: 'Bearer ' + auth.state.token },
-              });
-              commit('SET_EXPORTDATA', response.data); // 假設資料成功儲存
+                const response = await axios.post('/points/export', exportList, {
+                    headers: { Authorization: 'Bearer ' + auth.state.token },
+                });
+                commit('SET_EXPORTDATA', response.data); // 假設資料成功儲存
+                
+                // 獲取客戶端 IP
+                const clientIp = await dispatch('getClientIp');
+        
+                // 構建 LOG 資料
+                const logData = {
+                    logType: 'export_data',
+                    userId: auth.state.userId,
+                    studentId: null,          // 如果需要記錄學生 ID，可以從 exportList 中取出
+                    pointsId: null,           // 如果適用，填入相應的 pointsId
+                    ipAddress: clientIp,
+                    deviceInfo: navigator.userAgent,
+                    previousData: null,
+                    updatedData: null,
+                    addedData: null,
+                    exportParams: exportList // 記錄導出參數
+                };
+        
+                // 傳送 LOG
+                await dispatch('log/createLog', { logData, token: auth.state.token }, { root: true });
+                console.log("導出數據操作已記錄日誌。");
+        
             } catch (error) {
-              console.error('Error fetching export data:', error);
-              throw error;
+                console.error('Error fetching export data:', error);
+                throw error;
             }
         }
         
