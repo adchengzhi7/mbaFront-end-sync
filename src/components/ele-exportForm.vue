@@ -207,36 +207,6 @@ export default {
       }
     }
   },
-  convertToCSV(data) {
-      // 生成 CSV 標頭
-      const headers = Object.keys(data[0]);
-      const csvRows = [headers.join(',')];
-
-      // 將每個資料行轉換為 CSV 格式
-      data.forEach(row => {
-        const values = headers.map(header => {
-          const escaped = ('' + row[header]).replace(/"/g, '\\"'); // 避免雙引號衝突
-          return `"${escaped}"`;
-        });
-        csvRows.push(values.join(','));
-      });
-
-      return csvRows.join('\n');
-    },
-    downloadCSV(data) {
-      // 將資料轉換為 CSV 格式
-      const csvData = this.convertToCSV(data);
-
-      // 創建 Blob 對象並設置下載鏈接
-      const blob = new Blob([csvData], { type: 'text/csv' });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', 'exportData.csv'); // 設置文件名稱
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-    },
 },
 watch: {
   selectedExportOptions(newSelection) {

@@ -2,11 +2,11 @@
     <div v-if="sortData.data.length > 0">
       
         <button  @click="exportTableData" class="btn btn-success m-3"><i class="fas fa-save"></i> 匯出 CSV</button>
-        <customTable>
+        <customTable clsss="responsive-table">
             <template #thead>
                 <tr>
                     <th></th>
-                    <th :key="th.key" v-for="th in thead" @click="sortSelector(th.id, th.isSort)" scope="col">
+                    <th :class="th.class" :key="th.key" v-for="th in thead" @click="sortSelector(th.id, th.isSort)" scope="col">
                         <span :class="{ 'title-green': sortBy === th.id }">
                             {{ th.title }}
                             <i v-if="sortBy === th.id && isReverse === false" class="fas fa-sort-down"></i>
@@ -27,6 +27,7 @@
                     <td>{{ item.points_credit }}</td>
                     <td>{{ item.points_status }}</td>
                     <td>{{ item.points_stuid }}</td>
+                    <td>{{ item.usersDetails_cName }}</td>
                     <td>{{ item.points_regTime }}</td>
                     <td>{{ item.points_englishCredit || '-' }}</td>
                     <td>{{ item.points_englishCredit_date || '-' }}</td>
@@ -56,8 +57,8 @@ export default {
             }
         },
         exportTableData() {
-            let vm =this;
-            const headers = this.thead.map(th => th.title);
+            let vm = this;
+            const headers = this.thead.map(th => `"${th.title}"`); // 包裹標題在雙引號內
             const rows = this.sortData.data.map(item => [
                 item.points_type,
                 item.points_title,
@@ -66,6 +67,7 @@ export default {
                 item.points_credit,
                 item.points_status,
                 item.points_stuid,
+                item.usersDetails_cName,
                 item.points_regTime,
                 item.points_englishCredit || 'N/A',
                 item.points_englishCredit_date || 'N/A',
@@ -74,18 +76,23 @@ export default {
 
             let csvContent = headers.join(",") + "\n";
             rows.forEach(rowArray => {
-                let row = rowArray.join(",");
+                // 對每個欄位進行處理，去掉換行符並用雙引號包裹
+                let row = rowArray.map(value => {
+                    // 確保每個欄位用雙引號包裹，並去除內容中的換行符
+                    const sanitizedValue = ('' + value).replace(/\r?\n|\r/g, " "); // 將換行符替換為空格
+                    return `"${sanitizedValue.replace(/"/g, '""')}"`; // 將雙引號轉義並包裹整個欄位
+                }).join(",");
                 csvContent += row + "\n";
             });
 
-            // Add UTF-8 BOM to ensure correct encoding and avoid garbled text
+            // 添加 UTF-8 BOM 以確保 Excel 正確顯示編碼
             const bom = "\uFEFF";
             const blob = new Blob([bom + csvContent], { type: "text/csv;charset=utf-8;" });
             const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
 
             // 使用 `this.sortData` 或其他數據項作為檔案名稱的一部分
-            const currentYear = vm.sortData.data[0]?.points_regYear+"年度" || '未知學年';
+            const currentYear = vm.sortData.data[0]?.points_regYear + "年度" || '未知學年';
             const timestamp = new Date().toLocaleDateString("zh-TW", { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '-');
             const filename = `資料匯出_${currentYear}_${timestamp}.csv`;
 
@@ -146,17 +153,18 @@ export default {
                 2: "已審核"
             },
             thead: [
-                { key: "th02", id: "points_type", title: "項目類別", isSort: false },
-                { key: "th03", id: "points_title", title: "項目", isSort: false },
-                { key: "th04", id: "points_regYear", title: "學年", isSort: false },
-                { key: "th05", id: "points_regSemester", title: "學期", isSort: false },
-                { key: "th06", id: "points_credit", title: "點數", isSort: true },
-                { key: "th07", id: "points_status", title: "狀態", isSort: true },
-                { key: "th08", id: "points_stuid", title: "學號", isSort: false },
-                { key: "th09", id: "points_regTime", title: "登入時間", isSort: false },
-                { key: "th10", id: "points_englishCredit", title: "中英文檢定等級/分數", isSort: false },
-                { key: "th11", id: "points_englishCredit_date", title: "中英文檢定核發日期", isSort: false },
-                { key: "th12", id: "points_scholarshipHours", title: "獎助學金服務時數", isSort: false }
+                { key: "th02", class:"column8p", id: "points_type", title: "項目類別", isSort: false },
+                { key: "th03", class:"column-title ", id: "points_title", title: "項目", isSort: false },
+                { key: "th04", class:"", id: "points_regYear", title: "學年", isSort: false },
+                { key: "th05", class:"", id: "points_regSemester", title: "學期", isSort: false },
+                { key: "th06", class:"", id: "points_credit", title: "點數", isSort: true },
+                { key: "th07", class:"column8p", id: "points_status", title: "狀態", isSort: true },
+                { key: "th08", class:"column8p", id: "points_stuid", title: "學號", isSort: false },
+                { key: "th09", class:"column8p", id: "usersDetails_cName", title: "姓名", isSort: false },
+                { key: "th10", class:"", id: "points_regTime", title: "登入時間", isSort: false },
+                { key: "th11", class:"", id: "points_englishCredit", title: "中英文檢定等級/分數", isSort: false },
+                { key: "th12", class:"", id: "points_englishCredit_date", title: "中英文檢定核發日期", isSort: false },
+                { key: "th13", class:"", id: "points_scholarshipHours", title: "獎助學金服務時數", isSort: false }
             ],
             sortBy: "points_stuid",
             isReverse: false
@@ -166,6 +174,14 @@ export default {
 </script>
 
 <style scoped>
+.column8p{
+    width: 10%;
+      word-wrap: break-word; /* 在長內容處自動換行 */
+}
+.column-title {
+  width: 20%; /* 調整項目名稱欄的寬度 */
+  word-wrap: break-word; /* 在長內容處自動換行 */
+}
 .btn-success{
     background-color: var(--green) !important;
     border: 0px !important;

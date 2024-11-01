@@ -37,7 +37,7 @@ export default {
             }
           });
           commit('SET_ALL_LOGS', response.data.data); // 假設後端返回的日誌數據在 response.data.data
-          console.log("成功獲取所有日誌數據:", response);
+        //   console.log("成功獲取所有日誌數據:", response);
         } catch (error) {
           console.error("獲取日誌數據時出錯:", error);
           throw error;
