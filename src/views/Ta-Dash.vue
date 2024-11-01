@@ -274,4 +274,4 @@ a{
   -webkit-animation: horizontal 2s ease infinite;
   animation: horizontal 2s ease infinite;
 }
-</style>>
+</style>

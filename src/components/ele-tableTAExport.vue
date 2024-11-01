@@ -1,10 +1,6 @@
 <template>
     <div v-if="sortData.data.length > 0">
-        <div>
-            <div class="progress" style="height: 3px;">
-                <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" :style="{ 'width': loadingPrecentage + '%' }" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
-            </div>
-        </div>
+      
         <button  @click="exportTableData" class="btn btn-success m-3"><i class="fas fa-save"></i> 匯出 CSV</button>
         <customTable>
             <template #thead>
@@ -115,7 +111,6 @@ export default {
     },
     computed: {
         ...mapGetters({
-            loadingPrecentage: "student/loadingPrecentage",
             exportData: "userPoint/exportData"
         }),
         sortData() {
