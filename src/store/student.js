@@ -63,24 +63,23 @@ import auth from './auth'
         
     },
     actions:{
-        async getStudentList  ({dispatch}){
-            let response = await 
-            axios.get('/users/',{ 
-                headers:{'Authorization':'Bearer ' +auth.state.token }
-             })
-             .then(function (response) {
-                 if(response.data.success ==0){
+        async getStudentList({ dispatch }) {
+            try {
+                let response = await axios.get('/users/', {
+                    headers: { 'Authorization': 'Bearer ' + auth.state.token }
+                });
+
+                if (response.data.success === 0) {
+                    // 清除 token，並且拋出錯誤
+                    await dispatch('auth/clearToken', null, { root: true });
                     throw "invalid Token";
-                 }
-                 return response;
-              })
-              .catch(function (error) {
-                   throw error;
-              });
-        return dispatch('studentListCommit', response.data)
+                }
 
-
-
+                return dispatch('studentListCommit', response.data);
+            } catch (error) {
+                console.error("Error fetching student list:", error);
+                throw error;
+            }
         },
         studentListCommit({commit},data){
             return commit('SET_STUDENTLIST',data)

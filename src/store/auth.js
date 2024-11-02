@@ -2,6 +2,16 @@ import axios from 'axios'
 import jwt_decode from "jwt-decode";
 import auth from './auth'
 
+axios.interceptors.response.use(
+    response => response,
+    error => {
+      if (error.response && error.response.status === 401) { // 假設 401 表示 token 無效
+        auth.state.token = null; // 將 token 設為 null
+        this.$router.push('/home'); // 導向 home
+      }
+      return Promise.reject(error);
+    }
+  );
 
 export default {
     namespaced:true,
@@ -45,6 +55,9 @@ export default {
     mutations:{
         SET_TOKEN(state,token){
             state.token = token
+        },
+        CLEAR_TOKEN(state) {
+            state.token = null;
         },
         SET_USER(state,user){
             state.user = user
@@ -153,6 +166,9 @@ export default {
                 console.error('無法取得客戶端 IP:', error);
                 return '未知 IP';
             }
+        },
+        clearToken({ commit }) {
+            commit('CLEAR_TOKEN');
         },
         
     },
